@@ -1,6 +1,6 @@
 function pesquisabylinha(request, response){
     response.json({
-        date: request.query.id
+        entrada: request.query.id
     })
 }
 
