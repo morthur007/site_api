@@ -1,4 +1,5 @@
-export default function pesquisabylinha(request, response){
-    console.log(request.query.id)
-    return <div>olá</div>
+function pesquisabylinha(request, response){
+    response.json({
+        date: 123123
+    })
 }
