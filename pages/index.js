@@ -1,12 +1,10 @@
-import Link from 'next/link';
-
-function Home(){
-    return (<div>
-        <h1>Home</h1>
-        <Link  href="/sobre">
-            <a>Acessar página Sobre</a>
-        </Link>
-    </div>)
+function oi(){
+    return (
+    <div>
+        <h1>White page</h1>
+        <p>there is nothing here</p>
+    </div>
+    )
 }
 
-export default Home
+export default oi
