@@ -1,6 +1,9 @@
 async function pesquisabylinha(request, response){
-    const linhaApi = await fetch(`https://www.sistemas.dftrans.df.gov.br/linha/numero/${request.query.id}`)
-    
+    try{
+        const linhaApi = await fetch(`https://www.sistemas.dftrans.df.gov.br/linha/numero/${request.query.id}`)
+    }catch{
+        console.log(error)
+    }
 
     response.json({
         linha: "oi"
