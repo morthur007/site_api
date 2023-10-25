@@ -20,7 +20,6 @@ async function main(req, res){
             tarifa: resultCru[i].faixaTarifaria.tarifa
         }
     }
-    console.log(onibus)
 
     res.status(200).json({ 
         origem: origemEnd,
