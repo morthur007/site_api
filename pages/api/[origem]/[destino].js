@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 
 var apiUrl = 'https://www.sistemas.dftrans.df.gov.br/linha/'
-const posicaoParadas = fs.readFileSync('./pages/api/[origem]/paradas_info.json', 'utf8');
+const posicaoParadas = fs.readFileSync('./pages/paradas_info.json', 'utf8');
 const objetoJSON = JSON.parse(posicaoParadas);
 
 async function main(req, res){
