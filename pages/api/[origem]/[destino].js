@@ -14,12 +14,12 @@ async function main(req, res){
 
     const resultCru = await buscarLinhas(origemEnd, destinoEnd);
     
-    const onibus = {}
+    const onibus = []
     for(var i = 0; i < resultCru.length; i++){
-        onibus[i] = {
+        onibus.push({
             linha: resultCru[i].numero,
             tarifa: resultCru[i].faixaTarifaria.tarifa
-        }
+        })
     }
 
     res.status(200).json({ 
