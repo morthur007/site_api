@@ -9,7 +9,7 @@ async function pesquisabylinha(request, response){
 		}
 
 		response.json({
-			condition:"true"
+			condition:"true",
 			linha: linhaApiJson[0].numero,
 			tarifa: linhaApiJson[0].faixaTarifaria.tarifa,
 			sentidos,
