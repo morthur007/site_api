@@ -7,22 +7,30 @@ async function main(req, res){
     const result = await resultNoJson.json();
     let linhas = result.features;
 
-    let coordenadas = {onibus:[]};
-    var j=0;
-    for(var i = 0; i < Object.keys(linhas).length; i++){
-        const formt = {latitude: linhas[0].geometry.coordinates[1],longitude: linhas[0].geometry.coordinates[0]}
-        coordenadas.onibus[i] = formt;
+    if(Object.keys(linhas).length != 0){
+
+        let coordenadas = {onibus:[]};
+        var j=0;
+        for(var i = 0; i < Object.keys(linhas).length; i++){
+            const formt = {latitude: linhas[0].geometry.coordinates[1],longitude: linhas[0].geometry.coordinates[0]}
+            coordenadas.onibus[i] = formt;
+        }
+
+        const data = new Date(linhas[0].properties.horario);
+        const dataFormatada = `${data.toLocaleDateString()} ${data.toLocaleTimeString()}`;
+
+        res.json({
+            result: "true",
+            linha: linhas[0].properties.linha,
+            horario: dataFormatada,
+            coordenadas: coordenadas.onibus
+
+        })
+    }else{
+        res.json({
+            result: "false"
+        })
     }
-    var linha = linhas[0].properties.linha
-
-    const retorno = {
-        linha: linha,
-        onibus: coordenadas.onibus
-    }
-
-    
-
-    res.json(retorno)
     
 
 }
