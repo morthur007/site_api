@@ -17,7 +17,6 @@ async function main(req, res){
 
     const retorno = {
         linha: linha,
-        operadora: linhas[0].properties.operadora,
         onibus: coordenadas.onibus
     }
 
