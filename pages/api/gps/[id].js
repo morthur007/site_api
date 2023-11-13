@@ -12,7 +12,7 @@ async function main(req, res){
         let coordenadas = {onibus:[]};
         var j=0;
         for(var i = 0; i < Object.keys(linhas).length; i++){
-            const formt = {latitude: linhas[0].geometry.coordinates[1],longitude: linhas[0].geometry.coordinates[0]}
+            const formt = {latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
             coordenadas.onibus[i] = formt;
         }
 
