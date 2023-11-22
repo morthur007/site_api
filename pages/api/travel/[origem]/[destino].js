@@ -22,10 +22,12 @@ async function main(req, res) {
         coordenadas: coordenadas
       };
     });
+    const coordenadasResult = await Promise.all(coordenadasPromises);
+
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);
 
-    res.json([fimOrigem, fimDestino, coordenadasResult]);
+    res.json([fimOrigem, fimDestino, coordenadasFiltradas]);
   } catch (error) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
