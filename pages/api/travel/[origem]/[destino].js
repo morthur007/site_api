@@ -7,32 +7,31 @@ const objetoJSON = [{"codigo": "7006", "coordenadas": [-15.880182505615696, -47.
 let fimOrigem = 0
 let fimDestino = 0
 
-async function main(req, res){
+async function main(req, res) {
+  try {
     let { origem, destino } = req.query;
-    let origemEnd = origem.replace(/\+/g, ' ')
-    let destinoEnd = destino.replace(/\+/g, ' ')
+    let origemEnd = origem.replace(/\+/g, ' ');
+    let destinoEnd = destino.replace(/\+/g, ' ');
 
-    const linhas = await linhasfun(origemEnd, destinoEnd)
-    const finalResult = []
+    const linhas = await linhasfun(origemEnd, destinoEnd);
 
-    for(let linha of linhas){
-        const coordenadas = await gps(linha);
-        
-        if(coordenadas != null){
-            finalResult.push({
-                linha: linha,
-                coordenadas: coordenadas
-            })
-        }
+    const coordenadasPromises = linhas.map(async (linha) => {
+      const coordenadas = await gps(linha);
+      return {
+        linha: linha,
+        coordenadas: coordenadas
+      };
+    });
 
-    }
+    const coordenadasResult = await Promise.all(coordenadasPromises);
 
-    res.json([fimOrigem, fimDestino, finalResult])
-    
-    
-
-
+    res.json([fimOrigem, fimDestino, coordenadasResult]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erro Interno do Servidor');
+  }
 }
+
 
 async function linhasfun(origemEnd, destinoEnd){
     const resultCru = await buscarLinhas(origemEnd, destinoEnd);
