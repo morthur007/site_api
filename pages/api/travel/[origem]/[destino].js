@@ -69,10 +69,13 @@ function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
         }
     }
 
-    if(fimOrigem != null)
+    if(fimOrigem != null){
+        fimDestino = null
         fimDestino = coordenadaMaisProxima['coordenadas'];
-    else
+    }else{
+        fimOrigem = null
         fimOrigem = coordenadaMaisProxima['coordenadas'];
+    }
 
     return coordenadaMaisProxima['codigo'];
 }
