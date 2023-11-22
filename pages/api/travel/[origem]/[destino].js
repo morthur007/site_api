@@ -23,7 +23,7 @@ async function main(req, res) {
       };
     });
 
-    const coordenadasResult = await Promise.all(coordenadasPromises);
+    const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);
 
     res.json([fimOrigem, fimDestino, coordenadasResult]);
   } catch (error) {
