@@ -69,7 +69,7 @@ function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
         }
     }
 
-    if(fimOrigem == null){
+    if(fimOrigem == 0){
         fimOrigem = 0
         fimOrigem = coordenadaMaisProxima['coordenadas'];
     }else{
