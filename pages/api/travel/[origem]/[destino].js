@@ -116,7 +116,7 @@ async function gps(numero){
         let onibus = [];
         var j=0;
         for(var i = 0; i < Object.keys(linhas).length; i++){
-            const formt = {latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
+            const formt = {id: linhas[i].properties.numero, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
             onibus[i] = formt;
         }
 
