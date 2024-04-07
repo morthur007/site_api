@@ -16,9 +16,12 @@ async function main(req, res) {
     linhas = linhas[2];
 
     const coordenadasPromises = linhas.map(async (linha) => {
-      const coordenadas = await gps(linha);
-      return {
-        linha: linha,
+        let numero = linha.linha
+        let sentido = linha.sentido
+        const coordenadas = await gps(numero);
+        return {
+        linha: numero,
+        sentido: sentido,
         coordenadas: coordenadas
       };
     });
@@ -43,7 +46,9 @@ async function linhasfun(origemEnd, destinoEnd){
     
     const onibus = []
     for(var i = 0; i < resultCru.length; i++){
-        onibus.push(resultCru[i].numero)
+        let numero = resultCru[i].numero
+        let sentido = resultCru[i].sentido
+        onibus.push({linha: numero, sentido: sentido});
     }
 
     return [origem, destino, onibus]
