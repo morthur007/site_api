@@ -19,6 +19,7 @@ async function main(req, res) {
         let numero = linha.linha
         let sentido = linha.sentido
         const coordenadas = await gps(numero);
+        //teste
         return {
         linha: numero,
         sentido: sentido,
