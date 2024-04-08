@@ -123,14 +123,14 @@ async function gps(numero){
             let sentido;
 
             for(var j = 0; j < Object.keys(todosOsOnibus).length; i++){
-                if(todosOsOnibus[j].operadora.nome == linhas[j].properties.operadora){
+                if(todosOsOnibus[j].operadora.nome == linhas[i].properties.operadora){
                     veiculos = todosOsOnibus[j].veiculos;
                     break;
                 }
             }
 
-            for(var j = 0; j < Object.keys(veiculos).length; j++){
-                if(veiculos[j].numero == linhas[i].properties.numero){
+            for(var k = 0; k < Object.keys(veiculos).length; k++){
+                if(veiculos[k].numero == linhas[i].properties.numero){
                     sentido = veiculos.sentido;
                     break;
                 }
