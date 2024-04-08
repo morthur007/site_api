@@ -120,7 +120,7 @@ async function gps(numero){
 
             const todosOsOnibus = await fetch(apiUrl + "/service/gps/operacoes");
             let veiculos = []
-            let sentido;
+            var sentido;
 
             for(var j = 0; j < Object.keys(todosOsOnibus).length; i++){
                 if(todosOsOnibus[j].operadora.nome == linhas[i].properties.operadora){
