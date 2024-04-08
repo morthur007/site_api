@@ -117,7 +117,24 @@ async function gps(numero){
         let onibus = [];
         var j=0;
         for(var i = 0; i < Object.keys(linhas).length; i++){
-            const formt = {id: linhas[i].properties.numero, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
+
+            const todosOsOnibus = await fetch(apiUrl + "/service/gps/operacoes");
+            const veiculos = []
+            let sentido = null;
+
+            for(var j = 0; j < Object.keys(todosOsOnibus).length; i++){
+                if(todosOsOnibus[j].operadora.nome == linhas[i].properties.operadora){
+                    veiculos = todosOsOnibus[j].veiculos;
+                }
+            }
+
+            for(var j = 0; j < Object.keys(veiculos).length; j++){
+                if(veiculos[j].numero == linhas[i].properties.numero){
+                    sentido = veiculos.sentido;
+                }
+            }
+
+            const formt = {id: linhas[i].properties.numero,sentido: sentido, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
             onibus[i] = formt;
         }
 
