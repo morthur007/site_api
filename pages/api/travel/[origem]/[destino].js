@@ -125,12 +125,14 @@ async function gps(numero){
             for(var j = 0; j < Object.keys(todosOsOnibus).length; i++){
                 if(todosOsOnibus[j].operadora.nome == linhas[j].properties.operadora){
                     veiculos = todosOsOnibus[j].veiculos;
+                    break;
                 }
             }
 
             for(var j = 0; j < Object.keys(veiculos).length; j++){
                 if(veiculos[j].numero == linhas[i].properties.numero){
                     sentido = veiculos.sentido;
+                    break;
                 }
             }
 
