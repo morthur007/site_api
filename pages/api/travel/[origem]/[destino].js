@@ -131,12 +131,12 @@ async function gps(numero){
 
             for(var k = 0; k < Object.keys(veiculos).length; k++){
                 if(veiculos[k].numero == linhas[i].properties.numero){
-                    sentido = veiculos.sentido;
+                    sentido = veiculos[k].sentido;
                     break;
                 }
             }
 
-            const formt = {id: linhas[i].properties.numero,sentido: sentido, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
+            const formt = {id: linhas[i].properties.numero, sentido: sentido, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
             onibus[i] = formt;
         }
 
