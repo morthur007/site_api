@@ -106,54 +106,48 @@ async function buscarLinhas(origem, destino){
     
 }
 
-async function gps(numero){
-
+async function gps(numero) {
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
     const result = await resultNoJson.json();
     let linhas = result.features;
 
-    if(Object.keys(linhas).length != 0){
-
+    if (Object.keys(linhas).length !== 0) {
         let onibus = [];
-        var j=0;
-        for(var i = 0; i < Object.keys(linhas).length; i++){
 
+        for (let i = 0; i < Object.keys(linhas).length; i++) {
             const todosOsOnibus = await fetch(apiUrl + "/service/gps/operacoes");
-            let veiculos = []
-            var sentido;
+            const todosOsOnibusJson = await todosOsOnibus.json();
+            let veiculos = [];
 
-            for(var j = 0; j < Object.keys(todosOsOnibus).length; j++){
-                if(todosOsOnibus[j].operadora.nome == linhas[i].properties.operadora){
-                    veiculos = todosOsOnibus[j].veiculos;
+            for (let j = 0; j < todosOsOnibusJson.length; j++) {
+                if (todosOsOnibusJson[j].operadora.nome == linhas[i].properties.operadora) {
+                    veiculos = todosOsOnibusJson[j].veiculos;
                     break;
                 }
             }
 
-            for(var k = 0; k < Object.keys(veiculos).length; k++){
-                if(veiculos[k].numero == linhas[i].properties.numero){
+            let sentido;
+            for (let k = 0; k < veiculos.length; k++) {
+                if (veiculos[k].numero == linhas[i].properties.numero) {
                     sentido = veiculos[k].sentido;
                     break;
                 }
             }
 
-            const formt = {id: linhas[i].properties.numero, sentido: sentido, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
-            onibus[i] = formt;
+            const formt = {
+                id: linhas[i].properties.numero,
+                sentido: sentido,
+                latitude: linhas[i].geometry.coordinates[1],
+                longitude: linhas[i].geometry.coordinates[0]
+            };
+
+            onibus.push(formt);
         }
 
-        return onibus
-
-        /*res.json({
-            result: "true",
-            linha: linhas[0].properties.linha,
-            horario: dataFormatada,
-            coordenadas: coordenadas.onibus
-
-        })*/
-    }else{
-        return null
+        return onibus;
+    } else {
+        return null;
     }
-    
-
 }
 
 export default main;
