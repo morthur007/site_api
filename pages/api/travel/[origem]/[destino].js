@@ -119,7 +119,7 @@ async function gps(numero){
         for(var i = 0; i < Object.keys(linhas).length; i++){
 
             const todosOsOnibus = await fetch(apiUrl + "/service/gps/operacoes");
-            const veiculos = []
+            let veiculos = []
             let sentido = null;
 
             for(var j = 0; j < Object.keys(todosOsOnibus).length; i++){
