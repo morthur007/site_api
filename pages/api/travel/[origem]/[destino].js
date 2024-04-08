@@ -122,7 +122,7 @@ async function gps(numero){
             let veiculos = []
             var sentido;
 
-            for(var j = 0; j < Object.keys(todosOsOnibus).length; i++){
+            for(var j = 0; j < Object.keys(todosOsOnibus).length; j++){
                 if(todosOsOnibus[j].operadora.nome == linhas[i].properties.operadora){
                     veiculos = todosOsOnibus[j].veiculos;
                     break;
