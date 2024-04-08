@@ -129,7 +129,7 @@ async function gps(numero){
             }
 
             for(var j = 0; j < Object.keys(veiculos).length; j++){
-                if(veiculos[j].numero == linhas[i].properties.numero){
+                if(veiculos[j].numero == linhas[j].properties.numero){
                     sentido = veiculos.sentido;
                 }
             }
