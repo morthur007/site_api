@@ -38,7 +38,6 @@ async function main(req, res) {
 }
 
 async function linhasfun(origemEnd, destinoEnd){
-    // Carrega o arquivo JSON
     const caminhoArquivoJSON = path.join(__dirname, '..', '..', 'Json', 'paradas', 'paradas.json');
     const objetoJSON = JSON.parse(fs.readFileSync(caminhoArquivoJSON, 'utf8'));
 
@@ -56,6 +55,7 @@ async function linhasfun(origemEnd, destinoEnd){
 
     return [origem, destino, onibus];
 }
+
 
 async function buscarLinhas(origem, destino, objetoJSON){
     let origemCod = await enderecoParaCoordenadas(origem)
