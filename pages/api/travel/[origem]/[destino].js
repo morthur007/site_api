@@ -46,7 +46,7 @@ async function buscarRota(linha){
     const features = result.features;
     let rota = {}
 
-    if(features[0].properties.sentido == "circular"){
+    if(features[0].properties.sentido == "CIRCULAR"){
         let circular = corrigirErrosRota(features[0].geometry.coordinates)
         rota = {circular: circular}
     }else if (Object.keys(features).length == 2){
