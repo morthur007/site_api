@@ -149,7 +149,7 @@ async function gps(numero, rota) {
 
         for (let i = 0; i < Object.keys(linhas).length; i++) {
 
-            const local = calcularIndice(linhas[i].geometry.coordinates[1], linhas[i].geometry.coordinates[0], rota);
+            const local = await calcularIndice(linhas[i].geometry.coordinates[1], linhas[i].geometry.coordinates[0], rota);
 
             const formt = {
                 id: linhas[i].properties.numero,
