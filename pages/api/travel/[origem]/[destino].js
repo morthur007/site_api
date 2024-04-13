@@ -18,12 +18,14 @@ async function main(req, res) {
     const coordenadasPromises = linhas.map(async (linha) => {
         let numero = linha.linha
         let sentido = linha.sentido
+        const rota = buscarRota(linha.linha);
         const coordenadas = await gps(numero);
         //teste
         return {
         linha: numero,
         sentido: sentido,
-        coordenadas: coordenadas
+        coordenadas: coordenadas,
+        rota: rota
       };
     });
     const coordenadasResult = await Promise.all(coordenadasPromises);
@@ -36,6 +38,37 @@ async function main(req, res) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
   }
+}
+
+async function buscarRota(linha){
+    const resultNoJson = await fetch(`${apiUrl}/service/percurso/linha/numero/${linha}/WGS`);
+    const result = await resultNoJson.json();
+    const features = result.features;
+    const rota = {}
+
+    if(features[0].properties.sentido == "circular"){
+        const circular = corrigirErrosRota(features[0].geometry.coordinates)
+        rota = {circular: circular}
+    }else if (Object.keys(features).length == 2){
+        let sentido = features[0].properties.sentido
+        const ida = []
+        const volta = []
+    
+        if (sentido == 'IDA'){
+            ida = corrigirErrosRota(features[0].geometry.coordinates)
+            volta = corrigirErrosRota(features[1].geometry.coordinates)
+        }else{
+            ida = corrigirErrosRota(features[1].geometry.coordinates)
+            volta = corrigirErrosRota(features[0].geometry.coordinates)
+        }
+        rota = {ida: ida, volta: volta}
+    }else{
+        const ida = corrigirErrosRota(features[0].geometry.coordinates)
+        rota = {ida: ida}
+    }
+
+    return rota
+
 }
 
 
@@ -115,28 +148,8 @@ async function gps(numero) {
         let onibus = [];
 
         for (let i = 0; i < Object.keys(linhas).length; i++) {
-            const todosOsOnibus = await fetch(apiUrl + "/service/gps/operacoes");
-            const todosOsOnibusJson = await todosOsOnibus.json();
-            let veiculos = [];
-
-            for (let j = 0; j < todosOsOnibusJson.length; j++) {
-                if (todosOsOnibusJson[j].operadora.nome == linhas[i].properties.operadora) {
-                    veiculos = todosOsOnibusJson[j].veiculos;
-                    break;
-                }
-            }
-
-            let sentido;
-            for (let k = 0; k < veiculos.length; k++) {
-                if (veiculos[k].numero == linhas[i].properties.numero) {
-                    sentido = veiculos[k].sentido;
-                    break;
-                }
-            }
-
             const formt = {
                 id: linhas[i].properties.numero,
-                sentido: sentido,
                 latitude: linhas[i].geometry.coordinates[1],
                 longitude: linhas[i].geometry.coordinates[0]
             };
@@ -151,3 +164,63 @@ async function gps(numero) {
 }
 
 export default main;
+
+
+
+async function calcularDistanciaHaversine(latOrigem, lonOrigem, latDestino, lonDestino) {
+    const RAIO_TERRA = 6371.0;
+
+    const dLat = toRadians(latDestino - latOrigem);
+    const dLon = toRadians(lonDestino - lonOrigem); 
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(latOrigem)) * Math.cos(toRadians(latDestino)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return RAIO_TERRA * c;
+}
+
+async function corrigirErrosRota(rota) {
+    const newRota = [];
+
+    const coord = rota[0];
+    newRota.push([coord[1], coord[0]]);
+
+    let coord1 = newRota[0];
+
+    for (let i = 0; i < rota.length - 1; i++) {
+        const coord2 = [rota[i + 1][1], rota[i + 1][0]];
+
+        const lat1 = coord1[0];
+        const lon1 = coord1[1];
+        const lat2 = coord2[0];
+        const lon2 = coord2[1];
+
+        const totalDistance = calcularDistanciaHaversine(lat1, lon1, lat2, lon2) * 1000;
+        if (totalDistance >= 20) {
+            const numIntervals = Math.floor(totalDistance / 20);
+
+            const dLat = lat2 - lat1;
+            const dLon = lon2 - lon1;
+
+            for (let j = 0; j < numIntervals; j++) {
+                const fraction = (j + 1) / (numIntervals + 1);
+                const intermediateLat = lat1 + (dLat * fraction);
+                const intermediateLon = lon1 + (dLon * fraction);
+                newRota.push([intermediateLat, intermediateLon]);
+            }
+        } else {
+            newRota.push(coord2);
+        }
+        coord1 = newRota[newRota.length - 1];
+    }
+
+    console.log("testerota", newRota.length);
+
+    return newRota;
+}
+
+async function toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+}
