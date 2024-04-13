@@ -44,10 +44,9 @@ async function buscarRota(linha){
     const resultNoJson = await fetch(`${apiUrl}/service/percurso/linha/numero/${linha}/WGS`);
     const result = await resultNoJson.json();
     const features = result.features;
-    console.log(linha)
 
     if(features[0].properties.sentido == "CIRCULAR"){
-        let circular = await corrigirErrosRota(features[0].geometry.coordinates)
+        let circular = await corrigirErrosRota(features[0].geometry.coordinates, linha)
         const rota = {sentido: "CIRCULAR",circular: circular}
         return rota
     }else if (Object.keys(features).length == 2){
@@ -56,16 +55,16 @@ async function buscarRota(linha){
         let volta = []
     
         if (sentido == 'IDA'){
-            ida = await corrigirErrosRota(features[0].geometry.coordinates)
-            volta = await corrigirErrosRota(features[1].geometry.coordinates)
+            ida = await corrigirErrosRota(features[0].geometry.coordinates, linha)
+            volta = await corrigirErrosRota(features[1].geometry.coordinates, linha)
         }else{
-            ida = await corrigirErrosRota(features[1].geometry.coordinates)
-            volta = await corrigirErrosRota(features[0].geometry.coordinates)
+            ida = await corrigirErrosRota(features[1].geometry.coordinates, linha)
+            volta = await corrigirErrosRota(features[0].geometry.coordinates, linha)
         }
         const rota = {sentido: "IDAVOLTA",ida: ida, volta: volta}
         return rota
     }else{
-        let ida = await corrigirErrosRota(features[0].geometry.coordinates)
+        let ida = await corrigirErrosRota(features[0].geometry.coordinates, linha)
         const rota = {sentido: "IDA",ida: ida}
         return rota
     }
@@ -185,7 +184,7 @@ async function calcularDistanciaHaversine(latOrigem, lonOrigem, latDestino, lonD
     return RAIO_TERRA * c;
 }
 
-async function corrigirErrosRota(rota) {
+async function corrigirErrosRota(rota, linha) {
     const newRota = [];
 
     const coord = rota[0];
@@ -220,7 +219,7 @@ async function corrigirErrosRota(rota) {
         coord1 = newRota[newRota.length - 1];
     }
 
-    console.log("testerota", newRota.length);
+    console.log("testerota", linha);
 
     return newRota;
 }
