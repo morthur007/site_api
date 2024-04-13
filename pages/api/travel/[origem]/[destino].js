@@ -19,14 +19,10 @@ async function main(req, res) {
         let numero = linha.linha
         const rota = await buscarRota(linha.linha);
         const coordenadas = await gps(numero, rota);
-        const indiceOrigem = await calcularIndice(fimOrigem[0], fimOrigem[1], rota, linha.sentido)
-        const indiceDestino = await calcularIndice(fimDestino[0], fimDestino[1], rota, linha.sentido)
         //teste
         return {
         linha: numero,
         sentido: linha.sentido,
-        indiceOrigem: indiceOrigem.indice,
-        indiceDestino: indiceDestino.indice,
         coordenadas: coordenadas,
         rota: rota
       };
@@ -49,7 +45,7 @@ async function buscarRota(linha){
     const features = result.features;
 
     if(features[0].properties.sentido == "CIRCULAR"){
-        let circular = await corrigirErrosRota(features[0].geometry.coordinates)
+        let circular = features[0].geometry.coordinates
         const rota = {sentido: "CIRCULAR",circular: circular}
         return rota
     }else if (Object.keys(features).length == 2){
@@ -58,16 +54,16 @@ async function buscarRota(linha){
         let volta = []
     
         if (sentido == 'IDA'){
-            ida = await corrigirErrosRota(features[0].geometry.coordinates)
-            volta = await corrigirErrosRota(features[1].geometry.coordinates)
+            ida = features[0].geometry.coordinates
+            volta = features[1].geometry.coordinates
         }else{
-            ida = await corrigirErrosRota(features[1].geometry.coordinates)
-            volta = await corrigirErrosRota(features[0].geometry.coordinates)
+            ida = features[1].geometry.coordinates
+            volta = features[0].geometry.coordinates
         }
         const rota = {sentido: "IDAVOLTA",ida: ida, volta: volta}
         return rota
     }else{
-        let ida = await corrigirErrosRota(features[0].geometry.coordinates)
+        let ida = features[0].geometry.coordinates
         const rota = {sentido: "IDA",ida: ida}
         return rota
     }
@@ -151,13 +147,9 @@ async function gps(numero, rota) {
         let onibus = [];
 
         for (let i = 0; i < Object.keys(linhas).length; i++) {
-
-            const local = await calcularIndice(linhas[i].geometry.coordinates[1], linhas[i].geometry.coordinates[0], rota);
-
+            
             const formt = {
                 id: linhas[i].properties.numero,
-                sentido: local.sentido,
-                indice: local.indice,
                 latitude: linhas[i].geometry.coordinates[1],
                 longitude:linhas[i].geometry.coordinates[0]
             };
@@ -172,137 +164,3 @@ async function gps(numero, rota) {
 }
 
 export default main;
-
-
-
-async function calcularDistanciaHaversine(latOrigem, lonOrigem, latDestino, lonDestino) {
-    const RAIO_TERRA = 6371.0;
-
-    const dLat = await toRadians(latDestino - latOrigem);
-    const dLon = await toRadians(lonDestino - lonOrigem); 
-
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(await toRadians(latOrigem)) * Math.cos(await toRadians(latDestino)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return RAIO_TERRA * c;
-}
-
-async function corrigirErrosRota(rota) {
-    const newRota = [];
-
-    const coord = rota[0];
-    newRota.push([coord[1], coord[0]]);
-
-    let coord1 = newRota[0];
-
-    for (let i = 0; i < rota.length - 1; i++) {
-        const coord2 = [rota[i + 1][1], rota[i + 1][0]];
-
-        const lat1 = coord1[0];
-        const lon1 = coord1[1];
-        const lat2 = coord2[0];
-        const lon2 = coord2[1];
-
-        const totalDistance = await calcularDistanciaHaversine(lat1, lon1, lat2, lon2) * 1000;
-        if (totalDistance >= 20) {
-            const numIntervals = Math.floor(totalDistance / 20);
-
-            const dLat = lat2 - lat1;
-            const dLon = lon2 - lon1;
-
-            for (let j = 0; j < numIntervals; j++) {
-                const fraction = (j + 1) / (numIntervals + 1);
-                const intermediateLat = lat1 + (dLat * fraction);
-                const intermediateLon = lon1 + (dLon * fraction);
-                newRota.push([intermediateLat, intermediateLon]);
-            }
-        } else {
-            newRota.push(coord2);
-        }
-        coord1 = newRota[newRota.length - 1];
-    }
-
-    return newRota;
-}
-
-async function toRadians(degrees) {
-    return degrees * (Math.PI / 180);
-}
-
-async function calcularIndice(latitude, longitude, rota, sentidoOrigem){
-
-    if(Object.keys(rota).length == 3){
-
-        let coordAtual = rota.ida[0]
-        let indice = 0
-        let sentido = "IDA"
-
-        var distancia = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-
-        if(sentidoOrigem == "IDA" || sentidoOrigem == undefined){
-            for(var j = 1; j < rota.ida.length; j++){
-                coordAtual = rota.ida[j]
-                let distanciaAtual = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-                if(distanciaAtual < distancia){
-                    indice = j
-                }
-            }
-        }
-        if(sentidoOrigem == "VOLTA" || sentidoOrigem == undefined){
-            coordAtual = rota.volta[0]
-
-            for(var j = 1; j < rota.volta.length; j++){
-                coordAtual = rota.volta[j]
-                let distanciaAtual = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-                if(distanciaAtual < distancia){
-                    indice = j
-                    sentido = "VOLTA"
-                }
-            }
-        }
-        const result = {indice: indice, sentido: sentido}
-
-        return result
-        
-    }else if(rota.sentido == "CIRCULAR"){
-        let coordAtual = rota.circular[0]
-        let indice = 0
-
-        var distancia = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-
-        
-        for(var j = 1; j < rota.circular.length; j++){
-            coordAtual = rota.circular[j]
-            let distanciaAtual = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-            if(distanciaAtual < distancia){
-                indice = j
-            }
-        }
-        const result = {indice: indice, sentido: rota.sentido}
-
-        return result
-    
-    
-    }else{
-        let coordAtual = rota.ida[0]
-        let indice = 0
-        let sentido = "IDA"
-
-        var distancia = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-
-        
-        for(var j = 1; j < rota.ida.length; j++){
-            coordAtual = rota.ida[j]
-            let distanciaAtual = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
-            if(distanciaAtual < distancia){
-                indice = j
-            }
-        }
-        const result = {indice: indice, sentido: sentido}
-
-        return result
-    }
-
-}
