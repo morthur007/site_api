@@ -46,7 +46,7 @@ async function buscarRota(linha){
     const features = result.features;
 
     if(features[0].properties.sentido == "CIRCULAR"){
-        let circular = await corrigirErrosRota(features[0].geometry.coordinates, linha)
+        let circular = await corrigirErrosRota(features[0].geometry.coordinates)
         const rota = {sentido: "CIRCULAR",circular: circular}
         return rota
     }else if (Object.keys(features).length == 2){
@@ -55,16 +55,16 @@ async function buscarRota(linha){
         let volta = []
     
         if (sentido == 'IDA'){
-            ida = await corrigirErrosRota(features[0].geometry.coordinates, linha)
-            volta = await corrigirErrosRota(features[1].geometry.coordinates, linha)
+            ida = await corrigirErrosRota(features[0].geometry.coordinates)
+            volta = await corrigirErrosRota(features[1].geometry.coordinates)
         }else{
-            ida = await corrigirErrosRota(features[1].geometry.coordinates, linha)
-            volta = await corrigirErrosRota(features[0].geometry.coordinates, linha)
+            ida = await corrigirErrosRota(features[1].geometry.coordinates)
+            volta = await corrigirErrosRota(features[0].geometry.coordinates)
         }
         const rota = {sentido: "IDAVOLTA",ida: ida, volta: volta}
         return rota
     }else{
-        let ida = await corrigirErrosRota(features[0].geometry.coordinates, linha)
+        let ida = await corrigirErrosRota(features[0].geometry.coordinates)
         const rota = {sentido: "IDA",ida: ida}
         return rota
     }
@@ -184,7 +184,7 @@ async function calcularDistanciaHaversine(latOrigem, lonOrigem, latDestino, lonD
     return RAIO_TERRA * c;
 }
 
-async function corrigirErrosRota(rota, linha) {
+async function corrigirErrosRota(rota) {
     const newRota = [];
 
     const coord = rota[0];
@@ -219,8 +219,6 @@ async function corrigirErrosRota(rota, linha) {
         coord1 = newRota[newRota.length - 1];
     }
 
-    console.log("testerota", linha);
-
     return newRota;
 }
 
@@ -230,7 +228,7 @@ async function toRadians(degrees) {
 
 async function calcularIndice(latitude, longitude, rota){
 
-    if(Object.keys(rota).length == 2){
+    if(rota && Object.keys(rota).length === 2){
 
         let coordAtual = rota.ida[0]
         let indice = 0
@@ -261,7 +259,7 @@ async function calcularIndice(latitude, longitude, rota){
 
         return result
         
-    }else if(rota.sentido == "CIRCULAR"){
+    }else if(rota && rota.sentido === "CIRCULAR"){
         let coordAtual = rota.circular[0]
         let indice = 0
 
