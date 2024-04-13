@@ -17,13 +17,12 @@ async function main(req, res) {
 
     const coordenadasPromises = linhas.map(async (linha) => {
         let numero = linha.linha
-        let sentido = linha.sentido
         const rota = await buscarRota(linha.linha);
         const coordenadas = await gps(numero, rota);
         //teste
         return {
         linha: numero,
-        sentido: sentido,
+        sentido: rota.sentido,
         coordenadas: coordenadas,
         rota: rota
       };
