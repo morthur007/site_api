@@ -228,7 +228,7 @@ async function toRadians(degrees) {
 
 async function calcularIndice(latitude, longitude, rota){
 
-    if(rota && Object.keys(rota).length === 2){
+    if(Object.keys(rota).length == 3){
 
         let coordAtual = rota.ida[0]
         let indice = 0
@@ -259,7 +259,7 @@ async function calcularIndice(latitude, longitude, rota){
 
         return result
         
-    }else if(rota && rota.sentido === "CIRCULAR"){
+    }else if(rota.sentido == "CIRCULAR"){
         let coordAtual = rota.circular[0]
         let indice = 0
 
