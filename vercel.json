@@ -1,0 +1,14 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "json": "json/",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes":[
+        {
+            "json": "(.*)0"
+        }
+    ]
+}
