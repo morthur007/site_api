@@ -239,7 +239,7 @@ async function calcularIndice(latitude, longitude, rota){
         var distancia = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
 
         
-        for(var j = 1; j < Object.keys(rota.ida).length; j++){
+        for(var j = 1; j < rota.ida.length; j++){
             coordAtual = rota.ida[j]
             let distanciaAtual = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
             if(distanciaAtual < distancia){
@@ -249,7 +249,7 @@ async function calcularIndice(latitude, longitude, rota){
         }
         coordAtual = rota.volta[0]
 
-        for(var j = 1; j < Object.keys(rota.volta).length; j++){
+        for(var j = 1; j < rota.volta.length; j++){
             coordAtual = rota.volta[j]
             let distanciaAtual = await calcularDistanciaHaversine(latitude, longitude, coordAtual[0], coordAtual[1]);
             if(distanciaAtual < distancia){
