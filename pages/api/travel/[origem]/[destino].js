@@ -44,13 +44,13 @@ async function buscarRota(linha){
     const resultNoJson = await fetch(`${apiUrl}/service/percurso/linha/numero/${linha}/WGS`);
     const result = await resultNoJson.json();
     const features = result.features;
-    let rota = {}
 
     if(features[0].properties.sentido == "CIRCULAR"){
         let circular = corrigirErrosRota(features[0].geometry.coordinates)
-        rota = {circular: circular}
+        const rota = {circular: circular}
+        return rota
     }else if (Object.keys(features).length == 2){
-        let sentido = features[0].properties.sentido
+        var sentido = features[0].properties.sentido
         let ida = []
         let volta = []
     
@@ -61,13 +61,13 @@ async function buscarRota(linha){
             ida = corrigirErrosRota(features[1].geometry.coordinates)
             volta = corrigirErrosRota(features[0].geometry.coordinates)
         }
-        rota = {ida: ida, volta: volta}
+        const rota = {ida: ida, volta: volta}
+        return rota
     }else{
         let ida = corrigirErrosRota(features[0].geometry.coordinates)
-        rota = {ida: ida}
+        const rota = {ida: ida}
+        return rota
     }
-
-    return rota
 
 }
 
