@@ -18,7 +18,7 @@ async function main(req, res) {
     const coordenadasPromises = linhas.map(async (linha) => {
         let numero = linha.linha
         let sentido = linha.sentido
-        const rota = buscarRota(linha.linha);
+        const rota = await buscarRota(linha.linha);
         const coordenadas = await gps(numero);
         //teste
         return {
@@ -46,7 +46,7 @@ async function buscarRota(linha){
     const features = result.features;
 
     if(features[0].properties.sentido == "CIRCULAR"){
-        let circular = corrigirErrosRota(features[0].geometry.coordinates)
+        let circular = await corrigirErrosRota(features[0].geometry.coordinates)
         const rota = {circular: circular}
         return rota
     }else if (Object.keys(features).length == 2){
@@ -55,16 +55,16 @@ async function buscarRota(linha){
         let volta = []
     
         if (sentido == 'IDA'){
-            ida = corrigirErrosRota(features[0].geometry.coordinates)
-            volta = corrigirErrosRota(features[1].geometry.coordinates)
+            ida = await corrigirErrosRota(features[0].geometry.coordinates)
+            volta = await corrigirErrosRota(features[1].geometry.coordinates)
         }else{
-            ida = corrigirErrosRota(features[1].geometry.coordinates)
-            volta = corrigirErrosRota(features[0].geometry.coordinates)
+            ida = await corrigirErrosRota(features[1].geometry.coordinates)
+            volta = await corrigirErrosRota(features[0].geometry.coordinates)
         }
         const rota = {ida: ida, volta: volta}
         return rota
     }else{
-        let ida = corrigirErrosRota(features[0].geometry.coordinates)
+        let ida = await corrigirErrosRota(features[0].geometry.coordinates)
         const rota = {ida: ida}
         return rota
     }
@@ -170,11 +170,11 @@ export default main;
 async function calcularDistanciaHaversine(latOrigem, lonOrigem, latDestino, lonDestino) {
     const RAIO_TERRA = 6371.0;
 
-    const dLat = toRadians(latDestino - latOrigem);
-    const dLon = toRadians(lonDestino - lonOrigem); 
+    const dLat = await toRadians(latDestino - latOrigem);
+    const dLon = await toRadians(lonDestino - lonOrigem); 
 
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRadians(latOrigem)) * Math.cos(toRadians(latDestino)) *
+        Math.cos(await toRadians(latOrigem)) * Math.cos(await toRadians(latDestino)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -197,7 +197,7 @@ async function corrigirErrosRota(rota) {
         const lat2 = coord2[0];
         const lon2 = coord2[1];
 
-        const totalDistance = calcularDistanciaHaversine(lat1, lon1, lat2, lon2) * 1000;
+        const totalDistance = await calcularDistanciaHaversine(lat1, lon1, lat2, lon2) * 1000;
         if (totalDistance >= 20) {
             const numIntervals = Math.floor(totalDistance / 20);
 
