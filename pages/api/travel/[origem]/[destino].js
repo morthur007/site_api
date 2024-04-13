@@ -44,6 +44,7 @@ async function buscarRota(linha){
     const resultNoJson = await fetch(`${apiUrl}/service/percurso/linha/numero/${linha}/WGS`);
     const result = await resultNoJson.json();
     const features = result.features;
+    console.log(linha)
 
     if(features[0].properties.sentido == "CIRCULAR"){
         let circular = await corrigirErrosRota(features[0].geometry.coordinates)
@@ -153,8 +154,8 @@ async function gps(numero, rota) {
 
             const formt = {
                 id: linhas[i].properties.numero,
-                indice: local.indice,
-                sentido: local.sentido
+                sentido: local.sentido,
+                indice: local.indice
             };
 
             onibus.push(formt);
