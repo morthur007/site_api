@@ -153,7 +153,9 @@ async function gps(numero, rota) {
             const formt = {
                 id: linhas[i].properties.numero,
                 sentido: local.sentido,
-                indice: local.indice
+                indice: local.indice,
+                latitude: linhas[i].geometry.coordinates[1],
+                longitude:linhas[i].geometry.coordinates[0]
             };
 
             onibus.push(formt);
