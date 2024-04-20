@@ -138,15 +138,15 @@ async function getDistance(origem, destino) {
             console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
         }
     } catch (error) {
-        console.error(`Erro ao obter a distância: ${origem} ${destino}`);
+        console.error(`Erro ao obter a distância: ${error}`);   
     }
 }
 
 
 async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
     const coordenadasMaisProximas = await encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 10);
-    console.error(`Erro ao obter a distância: ${coordenadasMaisProximas}`);
     let coordenadaMaisProxima = coordenadasMaisProximas[0];
+    console.error(`teste coord usuario: ${coordenadaMaisProxima}`);   
     let menorDistancia = await getDistance(coordenadaUsuario, coordenadaMaisProxima.coordenadas);
 
     for (let i = 1; i < 10; i++) {
