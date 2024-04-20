@@ -122,7 +122,7 @@ async function encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 
 
 async function getDistance(origem, destino) {
     try {
-        const response = await axios.get(`http://router.project-osrm.org/route/v1/driving/${origem[1]},${origem[0]};${destino[1]},${destino[0]}`, {
+        const response = await axios.get(`http://router.project-osrm.org/route/v1/walking/${origem[1]},${origem[0]};${destino[1]},${destino[0]}`, {
             params: {
                 overview: 'false'
             }
