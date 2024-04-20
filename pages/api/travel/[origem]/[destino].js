@@ -109,18 +109,16 @@ async function calcularDistancia(coord1, coord2) {
 }
 
 async function encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, n) {
-    const distancias = coordenadas.map(async coord => {
+    const distancias = await Promise.all(coordenadas.map(async coord => {
         return {
             codigo: coord.codigo,
             coordenadas: coord.coordenadas,
             distancia: await calcularDistancia(coordenadaUsuario, coord.coordenadas)
         };
-    });
+    }));
 
-    
     distancias.sort((a, b) => a.distancia - b.distancia);
 
-    
     return distancias.slice(0, n).map(coord => ({codigo: coord.codigo, coordenadas: coord.coordenadas}));
 }
 
