@@ -94,20 +94,67 @@ async function linhasfun(origemEnd, destinoEnd){
 }
 
 function calcularDistancia(coord1, coord2) {
-    const deltaX = coord1[0] - coord2[0];
-    const deltaY = coord1[1] - coord2[1];
-    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const R = 6371e3; // metros
+    const lat1 = coord1[0] * Math.PI/180; // converte graus para radianos
+    const lat2 = coord2[0] * Math.PI/180;
+    const deltaLat = (coord2[0]-coord1[0]) * Math.PI/180;
+    const deltaLon = (coord2[1]-coord1[1]) * Math.PI/180;
+
+    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c; 
 }
 
-function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
-    let coordenadaMaisProxima = coordenadas[0];
-    let menorDistancia = calcularDistancia(coordenadaUsuario, coordenadaMaisProxima.coordenadas);
+async function encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, n) {
+    const distancias = coordenadas.map(coord => {
+        return {
+            codigo: coord.codigo,
+            coordenadas: coord.coordenadas,
+            distancia: calcularDistancia(coordenadaUsuario, coord.coordenadas)
+        };
+    });
 
-    for (let i = 1; i < coordenadas.length; i++) {
-        const distanciaAtual = calcularDistancia(coordenadaUsuario, coordenadas[i].coordenadas);
+    
+    distancias.sort((a, b) => a.distancia - b.distancia);
+
+    
+    return distancias.slice(0, n).map(coord => ({codigo: coord.codigo, coordenadas: coord.coordenadas}));
+}
+
+
+async function getDistance(origem, destino) {
+    try {
+        const response = await axios.get(`http://router.project-osrm.org/route/v1/driving/${origem[1]},${origem[0]};${destino[1]},${destino[0]}`, {
+            params: {
+                overview: 'false'
+            }
+        });
+
+        if (response.data.routes.length > 0) {
+            const distance = response.data.routes[0].distance;
+            console.log(`A distância entre as duas coordenadas é ${distance} metros`);
+        } else {
+            console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
+        }
+    } catch (error) {
+        console.error(`Erro ao obter a distância: ${error}`);
+    }
+}
+
+
+async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
+    const coordenadasMaisProximas = await encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 10);
+    let coordenadaMaisProxima = coordenadasMaisProximas[0];
+    let menorDistancia = await getDistance(coordenadaUsuario, coordenadaMaisProxima.coordenadas);
+
+    for (let i = 1; i < 10; i++) {
+        const distanciaAtual = await getDistance(coordenadaUsuario, coordenadasMaisProximas[i].coordenadas);
         if (distanciaAtual < menorDistancia) {
             menorDistancia = distanciaAtual;
-            coordenadaMaisProxima = coordenadas[i];
+            coordenadaMaisProxima = coordenadasMaisProximas[i];
         }
     }
 
