@@ -93,12 +93,12 @@ async function linhasfun(origemEnd, destinoEnd){
     });*/
 }
 
-async function calcularDistancia(coord1, coord2) {
+function calcularDistancia(coord1, coord2) {
     const R = 6371e3; // metros
-    const lat1 = coord1[0] * Math.PI/180; // converte graus para radianos
-    const lat2 = coord2[0] * Math.PI/180;
-    const deltaLat = (coord2[0]-coord1[0]) * Math.PI/180;
-    const deltaLon = (coord2[1]-coord1[1]) * Math.PI/180;
+    const [lat1, lon1] = coord1.map(c => c * Math.PI/180); // converte graus para radianos
+    const [lat2, lon2] = coord2.map(c => c * Math.PI/180);
+    const deltaLat = lat2 - lat1;
+    const deltaLon = lon2 - lon1;
 
     const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
             Math.cos(lat1) * Math.cos(lat2) *
@@ -109,19 +109,16 @@ async function calcularDistancia(coord1, coord2) {
 }
 
 async function encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, n) {
-    const distancias = await Promise.all(coordenadas.map(async coord => {
-        return {
-            codigo: coord.codigo,
-            coordenadas: coord.coordenadas,
-            distancia: await calcularDistancia(coordenadaUsuario, coord.coordenadas)
-        };
+    const distancias = coordenadas.map(coord => ({
+        codigo: coord.codigo,
+        coordenadas: coord.coordenadas,
+        distancia: calcularDistancia(coordenadaUsuario, coord.coordenadas)
     }));
 
     distancias.sort((a, b) => a.distancia - b.distancia);
 
-    return distancias.slice(0, n).map(coord => ({codigo: coord.codigo, coordenadas: coord.coordenadas}));
+    return distancias.slice(0, n);
 }
-
 
 async function getDistance(origem, destino) {
     try {
@@ -132,8 +129,7 @@ async function getDistance(origem, destino) {
         });
 
         if (response.data.routes.length > 0) {
-            const distance = response.data.routes[0].distance;
-            return distance
+            return response.data.routes[0].distance;
         } else {
             console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
         }
@@ -142,20 +138,18 @@ async function getDistance(origem, destino) {
     }
 }
 
-
 async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
     const coordenadasMaisProximas = await encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 10);
-    let coordenadaMaisProxima = coordenadasMaisProximas[0];
-    let menorDistancia = await getDistance(coordenadaUsuario, coordenadaMaisProxima.coordenadas);
-    console.log(JSON.stringify(menorDistancia, null, 2));
+    let menorDistancia = Infinity;
+    let coordenadaMaisProxima;
 
-    for (let i = 1; i < 10; i++) {
-        const distanciaAtual = await getDistance(coordenadaUsuario, coordenadasMaisProximas[i].coordenadas);
+    await Promise.all(coordenadasMaisProximas.map(async (coord) => {
+        const distanciaAtual = await getDistance(coordenadaUsuario, coord.coordenadas);
         if (distanciaAtual < menorDistancia) {
             menorDistancia = distanciaAtual;
-            coordenadaMaisProxima = coordenadasMaisProximas[i];
+            coordenadaMaisProxima = coord;
         }
-    }
+    }));
 
     return [coordenadaMaisProxima['codigo'], coordenadaMaisProxima['coordenadas']];
 }
@@ -167,46 +161,32 @@ async function enderecoParaCoordenadas(endereco) {
             format: 'json',
         },
     });
-
     const localizacao = resposta.data[0];
     return [parseFloat(localizacao.lat), parseFloat(localizacao.lon)];
 }
 
 async function buscarLinhas(origem, destino){
-    let origemCod = await enderecoParaCoordenadas(origem)
-    let destinoCod = await enderecoParaCoordenadas(destino)
-
-    let origemParad = await encontrarCoordenadaMaisProxima(origemCod, objetoJSON)
-    let destinoParad = await encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)
+    const [origemCod, destinoCod] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]);
+    const [origemParad, destinoParad] = await Promise.all([encontrarCoordenadaMaisProxima(origemCod, objetoJSON), encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)]);
     const resultNoJson = await fetch(apiUrl + 'linha/' + 'paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])
     const result = await resultNoJson.json()
     return [origemParad[1], destinoParad[1], result]
-    
 }
 
 async function gps(numero, rota) {
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
     const result = await resultNoJson.json();
     let linhas = result.features;
-
     if (Object.keys(linhas).length !== 0) {
-        let onibus = [];
-
-        for (let i = 0; i < Object.keys(linhas).length; i++) {
-            
-            const formt = {
-                id: linhas[i].properties.numero,
-                latitude: linhas[i].geometry.coordinates[1],
-                longitude:linhas[i].geometry.coordinates[0]
-            };
-
-            onibus.push(formt);
-        }
-
-        return onibus;
+        return linhas.map(linha => ({
+            id: linha.properties.numero,
+            latitude: linha.geometry.coordinates[1],
+            longitude: linha.geometry.coordinates[0]
+        }));
     } else {
         return null;
     }
 }
+
 
 export default main;
