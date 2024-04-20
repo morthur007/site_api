@@ -135,7 +135,7 @@ async function getDistance(origem, destino) {
 
         if (response.data.routes.length > 0) {
             const distance = response.data.routes[0].distance;
-            console.log(`A distância entre as duas coordenadas é ${distance} metros`);
+            return distance
         } else {
             console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
         }
