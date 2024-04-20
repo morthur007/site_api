@@ -133,7 +133,6 @@ async function getDistance(origem, destino) {
 
         if (response.data.routes.length > 0) {
             const distance = response.data.routes[0].distance;
-            console.log(JSON.stringify(response.data, null, 2));
             return distance
         } else {
             console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
@@ -147,7 +146,6 @@ async function getDistance(origem, destino) {
 async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
     const coordenadasMaisProximas = await encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 10);
     let coordenadaMaisProxima = coordenadasMaisProximas[0];
-    console.log(JSON.stringify(coordenadasMaisProximas, null, 2));
     let menorDistancia = await getDistance(coordenadaUsuario, coordenadaMaisProxima.coordenadas);
 
     for (let i = 1; i < 10; i++) {
@@ -157,6 +155,7 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
             coordenadaMaisProxima = coordenadasMaisProximas[i];
         }
     }
+    console.log(JSON.stringify(coordenadaMaisProxima, null, 2));
 
     return [coordenadaMaisProxima['codigo'], coordenadaMaisProxima['coordenadas']];
 }
