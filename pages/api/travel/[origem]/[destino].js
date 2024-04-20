@@ -147,6 +147,7 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
     const coordenadasMaisProximas = await encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 10);
     let coordenadaMaisProxima = coordenadasMaisProximas[0];
     let menorDistancia = await getDistance(coordenadaUsuario, coordenadaMaisProxima.coordenadas);
+    console.log(JSON.stringify(menorDistancia, null, 2));
 
     for (let i = 1; i < 10; i++) {
         const distanciaAtual = await getDistance(coordenadaUsuario, coordenadasMaisProximas[i].coordenadas);
@@ -155,7 +156,6 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
             coordenadaMaisProxima = coordenadasMaisProximas[i];
         }
     }
-    console.log(JSON.stringify(coordenadaMaisProxima, null, 2));
 
     return [coordenadaMaisProxima['codigo'], coordenadaMaisProxima['coordenadas']];
 }
