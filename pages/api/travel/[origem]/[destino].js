@@ -94,48 +94,19 @@ function calcularDistancia(coord1, coord2) {
     return R * c; 
 }
 
-async function encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, n) {
-    const distancias = coordenadas.map(coord => ({
-        codigo: coord.codigo,
-        coordenadas: coord.coordenadas,
-        distancia: calcularDistancia(coordenadaUsuario, coord.coordenadas)
-    }));
 
-    distancias.sort((a, b) => a.distancia - b.distancia);
-
-    return distancias.slice(0, n);
-}
-
-async function getDistance(origem, destino) {
-    try {
-        const response = await axios.get(`http://router.project-osrm.org/route/v1/walking/${origem[1]},${origem[0]};${destino[1]},${destino[0]}`, {
-            params: {
-                overview: 'false'
-            }
-        });
-
-        if (response.data.routes.length > 0) {
-            return response.data.routes[0].distance;
-        } else {
-            console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
-        }
-    } catch (error) {
-        console.error(`Erro ao obter a distância: ${error}`);   
-    }
-}
 
 async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
-    const coordenadasMaisProximas = await encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, 10);
     let menorDistancia = Infinity;
     let coordenadaMaisProxima;
 
-    await Promise.all(coordenadasMaisProximas.map(async (coord) => {
-        const distanciaAtual = await getDistance(coordenadaUsuario, coord.coordenadas);
+    coordenadasMaisProximas.forEach((coord) => {
+        const distanciaAtual = calcularDistancia(coordenadaUsuario, coord.coordenadas);
         if (distanciaAtual < menorDistancia) {
             menorDistancia = distanciaAtual;
             coordenadaMaisProxima = coord;
         }
-    }));
+    });
 
     return [coordenadaMaisProxima['codigo'], coordenadaMaisProxima['coordenadas']];
 }
