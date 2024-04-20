@@ -93,7 +93,7 @@ async function linhasfun(origemEnd, destinoEnd){
     });*/
 }
 
-function calcularDistancia(coord1, coord2) {
+async function calcularDistancia(coord1, coord2) {
     const R = 6371e3; // metros
     const lat1 = coord1[0] * Math.PI/180; // converte graus para radianos
     const lat2 = coord2[0] * Math.PI/180;
@@ -101,19 +101,19 @@ function calcularDistancia(coord1, coord2) {
     const deltaLon = (coord2[1]-coord1[1]) * Math.PI/180;
 
     const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
-              Math.cos(lat1) * Math.cos(lat2) *
-              Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+            Math.cos(lat1) * Math.cos(lat2) *
+            Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
     return R * c; 
 }
 
 async function encontrarCoordenadasMaisProximas(coordenadaUsuario, coordenadas, n) {
-    const distancias = coordenadas.map(coord => {
+    const distancias = coordenadas.map(async coord => {
         return {
             codigo: coord.codigo,
             coordenadas: coord.coordenadas,
-            distancia: calcularDistancia(coordenadaUsuario, coord.coordenadas)
+            distancia: await calcularDistancia(coordenadaUsuario, coord.coordenadas)
         };
     });
 
