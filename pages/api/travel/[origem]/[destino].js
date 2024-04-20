@@ -135,13 +135,12 @@ async function getDistance(origem, destino) {
 
         if (response.data.routes.length > 0) {
             const distance = response.data.routes[0].distance;
-            console.log(response)
             return distance
         } else {
             console.log('Não foi possível encontrar uma rota entre as duas coordenadas.');
         }
     } catch (error) {
-        console.error(`Erro ao obter a distância: ${error}`);
+        console.error(`Erro ao obter a distância: ${origem} ${destino}`);
     }
 }
 
