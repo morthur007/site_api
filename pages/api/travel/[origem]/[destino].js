@@ -100,7 +100,7 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
     let menorDistancia = Infinity;
     let coordenadaMaisProxima;
 
-    coordenadasMaisProximas.forEach((coord) => {
+    coordenadas.forEach((coord) => {
         const distanciaAtual = calcularDistancia(coordenadaUsuario, coord.coordenadas);
         if (distanciaAtual < menorDistancia) {
             menorDistancia = distanciaAtual;
@@ -110,6 +110,7 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
 
     return [coordenadaMaisProxima['codigo'], coordenadaMaisProxima['coordenadas']];
 }
+
 
 async function enderecoParaCoordenadas(endereco) {
     const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
