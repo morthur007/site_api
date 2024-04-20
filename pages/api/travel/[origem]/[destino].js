@@ -176,8 +176,8 @@ async function buscarLinhas(origem, destino){
     let origemCod = await enderecoParaCoordenadas(origem)
     let destinoCod = await enderecoParaCoordenadas(destino)
 
-    let origemParad = encontrarCoordenadaMaisProxima(origemCod, objetoJSON)
-    let destinoParad = encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)
+    let origemParad = await encontrarCoordenadaMaisProxima(origemCod, objetoJSON)
+    let destinoParad = await encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)
     const resultNoJson = await fetch(apiUrl + 'linha/' + 'paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])
     const result = await resultNoJson.json()
     return [origemParad[1], destinoParad[1], result]
