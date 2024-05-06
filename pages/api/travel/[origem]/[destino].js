@@ -16,7 +16,7 @@ async function main(req, res) {
     linhas = linhas[2];
 
     const coordenadasPromises = linhas.map(async (linha) => {
-        const coordenadas = await gps(linha.linha, rota);
+        const coordenadas = await gps(linha.linha);
         return {
             linha: linha.linha,
             sentido: linha.sentido,
@@ -60,8 +60,6 @@ function calcularDistancia(coord1, coord2) {
     return R * c; 
 }
 
-
-
 async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
     let menorDistancia = Infinity;
     let coordenadaMaisProxima;
@@ -97,7 +95,7 @@ async function buscarLinhas(origem, destino){
     return [origemParad[1], destinoParad[1], result]
 }
 
-async function gps(numero, rota) {
+async function gps(numero) {
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
     const result = await resultNoJson.json();
     let linhas = result.features;
