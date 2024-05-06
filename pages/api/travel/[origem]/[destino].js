@@ -16,13 +16,11 @@ async function main(req, res) {
     linhas = linhas[2];
 
     const coordenadasPromises = linhas.map(async (linha) => {
-        const rota = await buscarRota(linha.linha);
         const coordenadas = await gps(linha.linha, rota);
         return {
             linha: linha.linha,
             sentido: linha.sentido,
             coordenadas: coordenadas,
-            rota: rota
         };
     });
     const coordenadasResult = await Promise.all(coordenadasPromises);
@@ -35,38 +33,6 @@ async function main(req, res) {
     res.status(500).send('Erro Interno do Servidor');
   }
 }
-
-async function buscarRota(linha){
-    const resultNoJson = await fetch(`${apiUrl}/service/percurso/linha/numero/${linha}/WGS`);
-    const result = await resultNoJson.json();
-    const features = result.features;
-
-    if(features[0].properties.sentido == "CIRCULAR"){
-        let circular = features[0].geometry.coordinates
-        const rota = {sentido: "CIRCULAR",circular: circular}
-        return rota
-    }else if (Object.keys(features).length == 2){
-        var sentido = features[0].properties.sentido
-        let ida = []
-        let volta = []
-    
-        if (sentido == 'IDA'){
-            ida = features[0].geometry.coordinates
-            volta = features[1].geometry.coordinates
-        }else{
-            ida = features[1].geometry.coordinates
-            volta = features[0].geometry.coordinates
-        }
-        const rota = {sentido: "IDAVOLTA",ida: ida, volta: volta}
-        return rota
-    }else{
-        let ida = features[0].geometry.coordinates
-        const rota = {sentido: "IDA",ida: ida}
-        return rota
-    }
-
-}
-
 
 async function linhasfun(origemEnd, destinoEnd){
     let resultCru = await buscarLinhas(origemEnd, destinoEnd);
