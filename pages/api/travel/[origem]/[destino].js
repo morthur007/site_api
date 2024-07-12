@@ -20,7 +20,6 @@ async function main(req, res) {
     console.error('teste 1')
 
     const coordenadasPromises = linhas.map(async (linha) => {
-        console.error('teste loop')
         const coordenadas = await gps(linha.linha);
         return {
             linha: linha.linha,
@@ -30,6 +29,8 @@ async function main(req, res) {
     });
     console.error('teste 2')
     const coordenadasResult = await Promise.all(coordenadasPromises);
+
+    console.error('teste 5')
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);
 
