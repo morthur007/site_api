@@ -15,6 +15,8 @@ async function main(req, res) {
     let fimDestino = linhas[1];
     linhas = linhas[2];
 
+    console.error('teste')
+
     const coordenadasPromises = linhas.map(async (linha) => {
         const coordenadas = await gps(linha.linha);
         return {
