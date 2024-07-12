@@ -111,8 +111,8 @@ async function buscarLinhas(origem, destino){
 }
 
 async function gps(numero) {
-    console.error('teste 6 '+ numero)
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
+    console.log('teste 6 '+ numero + ' ', resultNoJson)
     const result = await resultNoJson.json();
     let linhas = result.features;
     if (Object.keys(linhas).length !== 0) {
