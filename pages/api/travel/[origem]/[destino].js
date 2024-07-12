@@ -20,6 +20,7 @@ async function main(req, res) {
     console.error('teste 1')
 
     const coordenadasPromises = linhas.map(async (linha) => {
+        console.error('teste loop')
         const coordenadas = await gps(linha.linha);
         return {
             linha: linha.linha,
