@@ -10,6 +10,8 @@ async function main(req, res) {
     let origemEnd = origem.replace(/\+/g, ' ');
     let destinoEnd = destino.replace(/\+/g, ' ');
 
+    console.error('teste 0')
+
     let linhas = await linhasfun(origemEnd, destinoEnd);
     let fimOrigem = linhas[0];
     let fimDestino = linhas[1];
