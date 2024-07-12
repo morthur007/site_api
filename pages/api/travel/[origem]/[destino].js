@@ -13,11 +13,13 @@ async function main(req, res) {
     console.error('teste 0')
 
     let linhas = await linhasfun(origemEnd, destinoEnd);
+    console.error('teste 1')
     let fimOrigem = linhas[0];
     let fimDestino = linhas[1];
     linhas = linhas[2];
+    console.error('teste 1.1')
+    
 
-    console.error('teste 1')
 
     const coordenadasPromises = linhas.map(async (linha) => {
         const coordenadas = await gps(linha.linha);
@@ -98,17 +100,20 @@ async function enderecoParaCoordenadas(endereco) {
 
 async function buscarLinhas(origem, destino){
     const [origemCod, destinoCod] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]);
+    console.error('teste 2.1')
     const [origemParad, destinoParad] = await Promise.all([encontrarCoordenadaMaisProxima(origemCod, objetoJSON), encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)]);
+    console.error('teste 2.2')
     const resultNoJson = await fetch(apiUrl + 'linha/' + 'paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])
+    console.error('teste 2.3')
     const result = await resultNoJson.json()
+    console.error('teste 2.4')
     return [origemParad[1], destinoParad[1], result]
 }
 
 async function gps(numero) {
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
-    console.log('teste 6 ', resultNoJson)
     const result = await resultNoJson.json();
-    console.error('teste 7')
+    console.error('teste 6 '+ result.features[0].properties.linha)
     let linhas = result.features;
     if (Object.keys(linhas).length !== 0) {
         return linhas.map(linha => ({
