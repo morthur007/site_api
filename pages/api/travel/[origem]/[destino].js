@@ -129,7 +129,6 @@ async function gps(numero) {
 async function buscarOnibusPorLinha(linhas) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const resultNoJson = await fetch("https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&request=GetFeature&typeName=semob:Ultima%20Posicao%20Transmitida&outputFormat=json");
-    console.error(resultNoJson)
 
     const resultJson = await resultNoJson.json();
     const result = resultJson.features
