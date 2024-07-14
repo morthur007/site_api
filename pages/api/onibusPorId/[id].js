@@ -1,35 +1,36 @@
 const axios = require('axios');
-var apiUrl = "https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&request=GetFeature&typeName=semob:Ultima%20Posicao%20Transmitida&outputFormat=json"
 
-async function main(req, res){
-  try{
-    
-    const numero = req.query.id;
+const apiUrl = "https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&request=GetFeature&typeName=semob:Ultima%20Posicao%20Transmitida&outputFormat=json";
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    const resultNoJson = await fetch(apiUrl);
+async function obterDados(req, res) {
+    try {
+        const numero = req.query.id;
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-    const result = await resultNoJson.json();
-    const onibusNoPlural = result.features
+        const resultNoJson = await fetch(apiUrl);
+        const result = await resultNoJson.json();
+        const onibusNoPlural = result.features;
 
-    onibusNoPlural.forEach((onibusAtual) => {
-      const properties = onibusAtual.properties
-      const id = properties.imei;
-      if(id == numero){
-        res.json({
-          linha: properties.numerolinha,
-          id: id,
-          latitude: properties.latitude,
-          longitude: properties.longitude
+        const onibusEncontrado = onibusNoPlural.find((onibusAtual) => {
+            const properties = onibusAtual.properties;
+            return properties.imei === numero;
+        });
 
-        })
-      }
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Erro Interno do Servidor');
-  }    
+        if (onibusEncontrado) {
+            const { numerolinha, imei, latitude, longitude } = onibusEncontrado.properties;
+            res.json({
+                linha: numerolinha,
+                id: imei,
+                latitude,
+                longitude
+            });
+        } else {
+            res.status(404).send('Ônibus não encontrado');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro Interno do Servidor');
+    }
 }
 
-export default main;
+export default obterDados;
