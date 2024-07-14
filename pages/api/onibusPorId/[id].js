@@ -6,6 +6,7 @@ async function main(req, res){
     
     let numero = req.query.id;
 
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const resultNoJson = await fetch(apiUrl);
     const result = await resultNoJson.json();
     const onibusNoPlural = result.features
