@@ -130,8 +130,9 @@ async function buscarOnibusPorLinha(linhas) {
     const resultNoJson = await fetch("https://geoserver.semob.df.gov.br/geoserver/semob/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=semob%3AUltima%20Posicao%20Transmitida&outputFormat=application%2Fjson");
 
     const resultJson = await resultNoJson.json();
+    console.error(resultJson)
     const result = resultJson.features
-    let onibusNoPlural = [...linhas];
+    let onibusNoPlural = linhas;
 
     result.forEach((onibusResponse) => {
         const properties = onibusResponse.properties
