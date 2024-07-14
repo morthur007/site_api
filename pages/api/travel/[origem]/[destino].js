@@ -21,7 +21,7 @@ async function main(req, res) {
     
 
 
-    const coordenadasPromises = linhas.map(async (linha) => {
+    /*const coordenadasPromises = linhas.map(async (linha) => {
         const coordenadas = await gps(linha.linha);
         return {
             linha: linha.linha,
@@ -34,7 +34,9 @@ async function main(req, res) {
 
     console.error('teste 5')
 
-    const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);
+    const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
+
+    const coordenadasFiltradas = buscarOnibusPorLinha(linhas)
 
     console.error('teste 3')
 
@@ -99,20 +101,18 @@ async function enderecoParaCoordenadas(endereco) {
 }
 
 async function buscarLinhas(origem, destino){
-    const [origemCod, destinoCod] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos
+    const [origemCod, destinoCod] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos, 1.34 segundos
     console.error('teste 2.1')
     const [origemParad, destinoParad] = await Promise.all([encontrarCoordenadaMaisProxima(origemCod, objetoJSON), encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)]); 
     console.error('teste 2.2')
-    const resultNoJson = await fetch(apiUrl + 'linha/' + 'paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])// 2,12 segundos
+    const resultNoJson = await fetch(apiUrl + 'linha/' + 'paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])// 2,12 segundos, 0.56 segundos
     console.error('teste 2.3')
     const result = await resultNoJson.json()
-    console.error('teste 2.4')
     return [origemParad[1], destinoParad[1], result]
 }
 
 async function gps(numero) {
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
-    console.log('teste 6 '+ numero + ' ', resultNoJson)
     const result = await resultNoJson.json();
     let linhas = result.features;
     if (Object.keys(linhas).length !== 0) {
@@ -124,6 +124,32 @@ async function gps(numero) {
     } else {
         return null;
     }
+}
+
+async function buscarOnibusPorLinha(linhas) {
+    const resultNoJson = await fetch("https://geoserver.semob.df.gov.br/geoserver/semob/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=semob%3AUltima%20Posicao%20Transmitida&outputFormat=application%2Fjson");
+
+    const resultJson = await resultNoJson.json();
+    const result = resultJson.features
+    let onibusNoPlural = [...linhas];
+
+    result.forEach((onibusResponse) => {
+        const properties = onibusResponse.properties
+        const numerolinha = properties.numerolinha;
+        const index = onibusNoPlural.findIndex(item => item.linha === numerolinha)
+        if (index != -1) {
+            const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
+
+            if('coordenadas' in onibusNoPlural[index]){
+                onibusNoPlural[index].coordenadas.push(coordenada);
+            }else{
+                onibusNoPlural[index].coordenadas = [coordenada]
+            }
+
+        }
+    });
+
+    return onibusNoPlural;
 }
 
 
