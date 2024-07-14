@@ -13,7 +13,7 @@ async function obterDados(req, res) {
 
         const onibusEncontrado = onibusNoPlural.find((onibusAtual) => {
             const properties = onibusAtual.properties;
-            return properties.imei === numero;
+            return properties.imei == numero;
         });
 
         if (onibusEncontrado) {
