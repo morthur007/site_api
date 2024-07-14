@@ -150,7 +150,7 @@ async function buscarOnibusPorLinha(linhas) {
 
         }
     });
-
+    onibusNoPlural = onibusNoPlural.filter(item => item !== null);
     return onibusNoPlural;
 }
 
