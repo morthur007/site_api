@@ -15,7 +15,7 @@ async function main(req, res){
     onibusNoPlural.forEach((onibusAtual) => {
       const properties = onibusAtual.properties
       const id = properties.imei;
-      if(id === numero){
+      if(id == numero){
         res.json({
           linha: properties.numerolinha,
           id: properties.numerolinha,
