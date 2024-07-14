@@ -18,7 +18,7 @@ async function main(req, res){
       if(id == numero){
         res.json({
           linha: properties.numerolinha,
-          id: properties.numerolinha,
+          id: id,
           latitude: properties.latitude,
           longitude: properties.longitude
 
