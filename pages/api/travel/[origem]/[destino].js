@@ -139,12 +139,17 @@ async function buscarOnibusPorLinha(linhas) {
         const numerolinha = properties.numerolinha;
         const index = linhas.findIndex(item => item.linha === numerolinha)
         if (index != -1) {
-            const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
+            const dataOnibus = new Date(properties.dataregistro)
+            const dataAtual = new Date();
+            const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
+            if(diferenca <= 1200){
+                const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
 
-            if (onibusNoPlural[index]) {
-                onibusNoPlural[index].coordenadas.push(coordenada);
-            } else {
-                onibusNoPlural[index] = { ...linhas[index], coordenadas: [coordenada] };
+                if (onibusNoPlural[index]) {
+                    onibusNoPlural[index].coordenadas.push(coordenada);
+                } else {
+                    onibusNoPlural[index] = { ...linhas[index], coordenadas: [coordenada] };
+                }
             }
 
         }

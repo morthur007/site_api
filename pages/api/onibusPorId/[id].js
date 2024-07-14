@@ -17,12 +17,16 @@ async function obterDados(req, res) {
         });
 
         if (onibusEncontrado) {
-            const { numerolinha, imei, latitude, longitude } = onibusEncontrado.properties;
+            const { numerolinha, imei, latitude, longitude, dataregistro } = onibusEncontrado.properties;
+            const dataOnibus = new Date(dataregistro)
+            const dataAtual = new Date();
+            const ultimoRegistro = (dataAtual.getTime() - dataOnibus.getTime())/1000
             res.json({
                 linha: numerolinha,
                 id: imei,
                 latitude,
-                longitude
+                longitude,
+                ultimoRegistro
             });
         } else {
             res.status(404).send('Ônibus não encontrado');
