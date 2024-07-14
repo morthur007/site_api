@@ -36,7 +36,7 @@ async function main(req, res) {
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
 
-    const coordenadasFiltradas = buscarOnibusPorLinha(linhas)
+    const coordenadasFiltradas = await buscarOnibusPorLinha(linhas)
 
     console.error('teste 3')
 
