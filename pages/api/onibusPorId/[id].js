@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 var apiUrl = "https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&request=GetFeature&typeName=semob:Ultima%20Posicao%20Transmitida&outputFormat=json"
 
 async function main(req, res){
