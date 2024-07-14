@@ -9,21 +9,18 @@ async function main(req, res){
 
     if(Object.keys(linhas).length != 0){
 
-        let coordenadas = {onibus:[]};
+        let coordenadas = [];
         var j=0;
         for(var i = 0; i < Object.keys(linhas).length; i++){
             const formt = {id: linhas[i].properties.numero, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
-            coordenadas.onibus[i] = formt;
+            coordenadas.push(formt);
         }
-
-        const data = new Date(linhas[0].properties.horario);
-        const dataFormatada = `${data.toLocaleDateString()} ${data.toLocaleTimeString()}`;
 
         res.json({
             result: "true",
             linha: linhas[0].properties.linha,
             horario: dataFormatada,
-            coordenadas: coordenadas.onibus
+            coordenadas: coordenadas
 
         })
     }else{
