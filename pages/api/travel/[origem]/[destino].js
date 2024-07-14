@@ -141,14 +141,14 @@ async function buscarOnibusPorLinha(linhas) {
         const index = linhas.findIndex(item => item.linha === numerolinha)
         if (index != -1) {
             const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
-
-            
-
-            if('coordenadas' in onibusNoPlural[index]){
-                onibusNoPlural[index].coordenadas.push(coordenada);
+            if(onibusNoPlural != undefined){
+                if('coordenadas' in onibusNoPlural[index]){
+                    onibusNoPlural[index].coordenadas.push(coordenada);
+                }else{
+                }
             }else{
-                onibusNoPlural[index] = linhas[index]
-                onibusNoPlural[index].coordenadas = [coordenada]
+                    onibusNoPlural[index] = linhas[index]
+                    onibusNoPlural[index].coordenadas = [coordenada]
             }
 
         }
