@@ -4,10 +4,11 @@ var apiUrl = "https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&
 async function main(req, res){
   try{
     
-    let numero = req.query.id;
+    const numero = req.query.id;
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const resultNoJson = await fetch(apiUrl);
+
     const result = await resultNoJson.json();
     const onibusNoPlural = result.features
 
@@ -16,8 +17,7 @@ async function main(req, res){
       const id = properties.imei;
       if(id === numero){
         res.json({
-          result: "true",
-          linha: linhas[0].properties.linha,
+          linha: properties.numerolinha,
           id: properties.numerolinha,
           latitude: properties.latitude,
           longitude: properties.longitude
