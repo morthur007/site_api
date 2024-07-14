@@ -15,11 +15,11 @@ async function main(req, res){
             const formt = {id: linhas[i].properties.numero, latitude: linhas[i].geometry.coordinates[1],longitude: linhas[i].geometry.coordinates[0]}
             coordenadas.push(formt);
         }
+            
 
         res.json({
             result: "true",
             linha: linhas[0].properties.linha,
-            horario: dataFormatada,
             coordenadas: coordenadas
 
         })
