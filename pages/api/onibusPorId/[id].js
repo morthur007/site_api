@@ -17,8 +17,8 @@ async function obterDados(req, res) {
         });
 
         if (onibusEncontrado) {
-            const { numerolinha, imei, latitude, longitude, dataregistro } = onibusEncontrado.properties;
-            const dataOnibus = new Date(dataregistro)
+            const { numerolinha, imei, latitude, longitude, datalocal } = onibusEncontrado.properties;
+            const dataOnibus = new Date(datalocal)
             const dataAtual = new Date();
             const ultimoRegistro = (dataAtual.getTime() - dataOnibus.getTime())/1000
             res.json({

@@ -139,7 +139,7 @@ async function buscarOnibusPorLinha(linhas) {
         const numerolinha = properties.numerolinha;
         const index = linhas.findIndex(item => item.linha === numerolinha)
         if (index != -1) {
-            const dataOnibus = new Date(properties.dataregistro)
+            const dataOnibus = new Date(properties.datalocal)
             const dataAtual = new Date();
             const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
             if(diferenca <= 1200){
