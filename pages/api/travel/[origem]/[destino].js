@@ -105,13 +105,13 @@ async function buscarLinhas(origem, destino){
     console.error('teste 2.1')
     const [origemParad, destinoParad] = await Promise.all([encontrarCoordenadaMaisProxima(origemCod, objetoJSON), encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)]); 
     console.error('teste 2.2')
-    const resultNoJson = await fetch(apiUrl + 'linha/' + 'paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])// 2,12 segundos, 0.56 segundos
+    const resultNoJson = await fetch(apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])// 2,12 segundos, 0.56 segundos
     console.error('teste 2.3')
     const result = await resultNoJson.json()
     return [origemParad[1], destinoParad[1], result]
 }
 
-async function gps(numero) {
+/*async function gps(numero) {
     const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
     const result = await resultNoJson.json();
     let linhas = result.features;
@@ -124,7 +124,7 @@ async function gps(numero) {
     } else {
         return null;
     }
-}
+}*/
 
 async function buscarOnibusPorLinha(linhas) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -142,7 +142,7 @@ async function buscarOnibusPorLinha(linhas) {
             const dataOnibus = new Date(properties.datalocal)
             const dataAtual = new Date();
             const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
-            if(diferenca <= 1200){
+            if(diferenca <= 120){
                 const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
 
                 if (onibusNoPlural[index]) {
