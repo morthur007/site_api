@@ -90,9 +90,14 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
 
 
 async function enderecoParaCoordenadas(endereco) {
-    const resultNoJson = await fetch(`https://nominatim.openstreetmap.org/search?q=${endereco}&format=json`);
-    const data = await resultNoJson.json();
-    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+            q: endereco,
+            format: 'json',
+        },
+    });
+    const localizacao = resposta.data[0];
+    return [parseFloat(localizacao.lat), parseFloat(localizacao.lon)];
 }
 
 async function buscarLinhas(origem, destino){
