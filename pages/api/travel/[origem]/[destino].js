@@ -142,7 +142,7 @@ async function buscarOnibusPorLinha(linhas) {
             const dataOnibus = new Date(properties.datalocal)
             const dataAtual = new Date();
             const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
-            if(diferenca <= 120){
+            if(diferenca <= 300){
                 const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
 
                 if (onibusNoPlural[index]) {
