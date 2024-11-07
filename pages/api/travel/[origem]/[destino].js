@@ -9,6 +9,7 @@ async function main(req, res) {
     let { origem, destino } = req.query;
     let origemEnd = origem
     let destinoEnd = destino
+    console.log('teste 0')
 
     let linhas = await linhasfun(origemEnd, destinoEnd);
     console.log('teste 1')
