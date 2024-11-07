@@ -90,6 +90,7 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
 
 
 async function enderecoParaCoordenadas(endereco) {
+    console.error(endereco)
     const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
         params: {
             q: endereco,
