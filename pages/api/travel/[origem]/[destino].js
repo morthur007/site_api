@@ -7,8 +7,8 @@ const objetoJSON = [{"codigo": "7006", "coordenadas": [-15.880182505615696, -47.
 async function main(req, res) {
   try {
     let { origem, destino } = req.query;
-    let origemEnd = origem
-    let destinoEnd = destino
+    let origemEnd = decodeURIComponent(origem).replace(/\+/g, " ");
+    let destinoEnd = decodeURIComponent(destino).replace(/\+/g, " ");
     console.log('teste 0')
 
     let linhas = await linhasfun(origemEnd, destinoEnd);
@@ -90,12 +90,7 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
 
 async function enderecoParaCoordenadas(endereco) {
     console.log('nomatin')
-    const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: {
-            q: endereco,
-            format: 'json',
-        },
-    });
+    const resposta = await axios.get(`https://nominatim.openstreetmap.org/search?q=${endereco}&format=json`);
     console.log('nomatin 2')
     const localizacao = resposta.data[0];
     return [parseFloat(localizacao.lat), parseFloat(localizacao.lon)];
