@@ -30,7 +30,7 @@ async function main(req, res) {
     console.error('teste 2')
     const coordenadasResult = await Promise.all(coordenadasPromises);
 
-    console.error('teste 5') a
+    console.error('teste 5')
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
 
@@ -88,14 +88,14 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
 
 
 async function enderecoParaCoordenadas(endereco) {
-    console.error('nomatin')
+    console.log('nomatin')
     const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
         params: {
             q: endereco,
             format: 'json'
         }
     });
-    console.error('nomatin 2')
+    console.log('nomatin 2')
     const localizacao = resposta.data[0];
     return [parseFloat(localizacao.lat), parseFloat(localizacao.lon)];
 }
