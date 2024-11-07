@@ -93,8 +93,8 @@ async function enderecoParaCoordenadas(endereco) {
     const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
         params: {
             q: endereco,
-            format: 'json'
-        }
+            format: 'json',
+        },
     });
     console.log('nomatin 2')
     const localizacao = resposta.data[0];
