@@ -7,8 +7,8 @@ const objetoJSON = [{"codigo": "7006", "coordenadas": [-15.880182505615696, -47.
 async function main(req, res) {
   try {
     let { origem, destino } = req.query;
-    let origemEnd = decodeURIComponent(origem).replace(/\+/g, " ");
-    let destinoEnd = decodeURIComponent(destino).replace(/\+/g, " ");
+    let origemEnd = origem
+    let destinoEnd = destino
 
     console.error('teste 0')
 
