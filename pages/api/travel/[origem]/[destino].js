@@ -11,7 +11,6 @@ async function main(req, res) {
     let destinoEnd = destino
 
     console.error('teste 0')
-    console.error(origemEnd)
 
     let linhas = await linhasfun(origemEnd, destinoEnd);
     console.error('teste 1')
@@ -91,12 +90,14 @@ async function encontrarCoordenadaMaisProxima(coordenadaUsuario, coordenadas) {
 
 
 async function enderecoParaCoordenadas(endereco) {
+    console.error('nomatin')
     const resposta = await axios.get('https://nominatim.openstreetmap.org/search', {
         params: {
             q: endereco,
             format: 'json'
         }
     });
+    console.error('nomatin 2')
     const localizacao = resposta.data[0];
     return [parseFloat(localizacao.lat), parseFloat(localizacao.lon)];
 }
