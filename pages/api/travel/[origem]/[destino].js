@@ -30,7 +30,7 @@ async function main(req, res) {
     console.error('teste 2')
     const coordenadasResult = await Promise.all(coordenadasPromises);
 
-    console.error('teste 5')
+    console.error('teste 5') a
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
 
