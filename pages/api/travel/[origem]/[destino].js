@@ -11,11 +11,11 @@ async function main(req, res) {
     let destinoEnd = destino
 
     let linhas = await linhasfun(origemEnd, destinoEnd);
-    console.error('teste 1')
+    console.log('teste 1')
     let fimOrigem = linhas[0];
     let fimDestino = linhas[1];
     linhas = linhas[2];
-    console.error('teste 1.1')
+    console.log('teste 1.1')
     
 
 
@@ -36,7 +36,7 @@ async function main(req, res) {
 
     const coordenadasFiltradas = await buscarOnibusPorLinha(linhas)
 
-    console.error('teste 3')
+    console.log('teste 3')
 
     res.json([fimOrigem, fimDestino, coordenadasFiltradas]);
   } catch (error) {
@@ -102,11 +102,11 @@ async function enderecoParaCoordenadas(endereco) {
 
 async function buscarLinhas(origem, destino){
     const [origemCod, destinoCod] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos, 1.34 segundos
-    console.error('teste 2.1')
+    console.log('teste 2.1')
     const [origemParad, destinoParad] = await Promise.all([encontrarCoordenadaMaisProxima(origemCod, objetoJSON), encontrarCoordenadaMaisProxima(destinoCod, objetoJSON)]); 
-    console.error('teste 2.2')
+    console.log('teste 2.2')
     const resultNoJson = await fetch(apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0])// 2,12 segundos, 0.56 segundos
-    console.error('teste 2.3')
+    console.log('teste 2.3')
     const result = await resultNoJson.json()
     return [origemParad[1], destinoParad[1], result]
 }
