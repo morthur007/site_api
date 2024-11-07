@@ -10,8 +10,6 @@ async function main(req, res) {
     let origemEnd = origem
     let destinoEnd = destino
 
-    console.error('teste 0')
-
     let linhas = await linhasfun(origemEnd, destinoEnd);
     console.error('teste 1')
     let fimOrigem = linhas[0];
