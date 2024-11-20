@@ -43044,7 +43044,7 @@ async function main(req, res) {
 
     console.log('teste 3')
 
-    res.json([result[0], result[1], result[2]]);
+    res.json([result[0], result[1], coordenadasFiltradas]);
   } catch (error) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
@@ -43136,7 +43136,7 @@ async function buscarLinhas(origem, destino){
     const [origemCoord, destinoCoord] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos, 1.34 segundos
     console.log('teste 2.1')
     const [origemParad, destinoParad] = await Promise.all([encontrarParadaMaisProxima(origemCoord, objetoJSON), encontrarParadaMaisProximaDestino(destinoCoord, objetoJSON)]); 
-    console.log('teste 2.2')
+    console.log('teste 2.2 --> ' + apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + parada.codigo)
     const result = destinoParad.map(async (parada) => {
         const response = await fetch(apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + parada.codigo)// 2,12 segundos, 0.56 segundos
         const responseJson = await response.json()
