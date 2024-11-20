@@ -43140,7 +43140,7 @@ async function buscarLinhas(origem, destino){
     const result = destinoParad.map(async (parada) => {
         const response = await fetch(apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + parada.codigo)// 2,12 segundos, 0.56 segundos
         const responseJson = await response.json()
-        return responseJson.map(item => {return [{linha: item.numero, sentido: item.sentido}]})
+        return responseJson.map(item => {return {linha: item.numero, sentido: item.sentido}})
     })
     console.log('teste 2.3')
     return [origemParad[1], destinoParad, result]
