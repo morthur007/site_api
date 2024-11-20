@@ -43044,7 +43044,7 @@ async function main(req, res) {
 
     console.log('teste 3')
 
-    res.json([result[0], result[1], coordenadasFiltradas]);
+    res.json([result[0], result[1], result[2]]);
   } catch (error) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
