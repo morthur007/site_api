@@ -43018,7 +43018,7 @@ async function main(req, res) {
     let { origem, destino } = req.query;
     let origemEnd = decodeURIComponent(origem).replace(/\+/g, " ");
     let destinoEnd = decodeURIComponent(destino).replace(/\+/g, " ");
-    console.log('teste 0' + origem + " " + destino)
+    console.log('teste 0' + origemEnd + " " + destinoEnd)
 
     let result = await buscarLinhas(origemEnd, destinoEnd);
     console.log('teste 1')
