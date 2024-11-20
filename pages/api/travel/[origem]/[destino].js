@@ -43129,8 +43129,7 @@ async function enderecoParaCoordenadas(endereco) {
     const resposta = await fetch(`https://nominatim.openstreetmap.org/search?q=${endereco}&format=json`);
     console.log('nomatin 2')
     const respostaJson = await resposta.json();
-    const localizacao = respostaJson.data[0];
-    return [parseFloat(localizacao.lat), parseFloat(localizacao.lon)];
+    return [parseFloat(respostaJson[0].lat), parseFloat(respostaJson[0].lon)];
 }
 
 async function buscarLinhas(origem, destino){
