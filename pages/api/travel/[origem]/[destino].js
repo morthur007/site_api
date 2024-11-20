@@ -43042,7 +43042,7 @@ async function main(req, res) {
 
     const paradasDestino = result[2]
 
-    const coordenadasFiltradas = paradasDestino.map(async parada => {return await buscarOnibusPorLinha(parada)})
+    const coordenadasFiltradas =  await Promise.all(paradasDestino.map(async parada => {return await buscarOnibusPorLinha(parada)}))
 
     console.log('teste 3')
 
