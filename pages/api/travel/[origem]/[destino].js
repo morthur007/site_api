@@ -43018,7 +43018,7 @@ async function main(req, res) {
     let { origem, destino } = req.query;
     let origemEnd = decodeURIComponent(origem);
     let destinoEnd = decodeURIComponent(destino);
-    console.log('teste 0' + origemEnd + " " + destinoEnd)
+    console.log('teste 0 ' + origemEnd + " " + destinoEnd)
 
     let result = await buscarLinhas(origemEnd, destinoEnd);
     console.log('teste 1')
@@ -43044,7 +43044,7 @@ async function main(req, res) {
 
     console.log('teste 3')
 
-    res.json([result[0], result[1], coordenadasFiltradas]);
+    res.json([result[0], result[1], result]);
   } catch (error) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
