@@ -43040,11 +43040,11 @@ async function main(req, res) {
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
 
-    const coordenadasFiltradas = result[2].map(async parada => await buscarOnibusPorLinha(parada))
+    const coordenadasFiltradas = result[2].map(async parada => {return await buscarOnibusPorLinha(parada)})
 
     console.log('teste 3')
 
-    res.json([result[0], result[1], result[2]]);
+    res.json([result[0], result[1], coordenadasFiltradas]);
   } catch (error) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
