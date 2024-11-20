@@ -43133,9 +43133,7 @@ async function enderecoParaCoordenadas(endereco) {
 }
 
 async function buscarLinhas(origem, destino){
-    //const [origemCod, destinoCod] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos, 1.34 segundos
-    const origemCoord = await enderecoParaCoordenadas(origem)
-    const destinoCoord = await enderecoParaCoordenadas(destino)
+    const [origemCoord, destinoCoord] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos, 1.34 segundos
     console.log('teste 2.1')
     const [origemParad, destinoParad] = await Promise.all([encontrarParadaMaisProxima(origemCoord, objetoJSON), encontrarParadaMaisProximaDestino(destinoCoord, objetoJSON)]); 
     console.log('teste 2.2')
