@@ -43016,8 +43016,8 @@ const objetoJSON = [
 async function main(req, res) {
   try {
     let { origem, destino } = req.query;
-    let origemEnd = decodeURIComponent(origem).replace(/\+/g, " ");
-    let destinoEnd = decodeURIComponent(destino).replace(/\+/g, " ");
+    let origemEnd = decodeURIComponent(origem);
+    let destinoEnd = decodeURIComponent(destino);
     console.log('teste 0' + origemEnd + " " + destinoEnd)
 
     let result = await buscarLinhas(origemEnd, destinoEnd);
