@@ -43040,7 +43040,7 @@ async function main(req, res) {
 
     const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
 
-    const coordenadasFiltradas = result[2].map(async parada => {return await buscarOnibusPorLinha(parada)})
+    const coordenadasFiltradas = await buscarOnibusPorLinha(result[2][0]) //result[2].map(async parada => {return await buscarOnibusPorLinha(parada)})
 
     console.log('teste 3')
 
