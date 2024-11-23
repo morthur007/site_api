@@ -43099,7 +43099,7 @@ async function encontrarParadaMaisProximaDestino(coordenadaDestino, paradas) {
         const distanciaAtual = calcularDistancia(coordenadaDestino, parada.coordenadas);
         parada['distancia'] = distanciaAtual;
 
-        if (paradasMaisProximas.length < 7) {
+        if (paradasMaisProximas.length < 10) {
             paradasMaisProximas.push(parada);
         }else{
             
