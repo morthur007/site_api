@@ -1,3 +1,5 @@
+import { format } from 'path';
+
 const axios = require('axios');
 const fs = require('fs');
 
@@ -43168,33 +43170,63 @@ async function buscarLinhas(origem, destino){
 }*/
 
 async function buscarOnibusPorLinha(linhas) {
+    const onibusResult = linhas.map(async linha => {
+        const resultNoJson = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`)
+        const resultJson = await resultNoJson.json();
+        const features = resultJson.features
+        const todosOnibus = features.map(onibus => {
+            const properties = onibus.properties
+            const horarioOnibus = new Date(properties.horario)
+            const horarioAtual = new Date()
+            const diferenca = horarioOnibus - horarioAtual;
+
+            if(diferenca <= 300){
+                return {id:properties.numero, latitude:onibus.geometry.coordinates[1], longitude:onibus.geometry.coordinates[0]}
+            }
+            return null
+        })
+        return {...linhas, coordenadas: todosOnibus}
+    })
+
+    return onibusResult.filter(linha => linha !== null)
+    
+}
+
+async function buscarOnibusPorLinha2(linhas) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const resultNoJson = await fetch("https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&request=GetFeature&typeName=semob:Ultima%20Posicao%20Transmitida&outputFormat=json");
 
     const resultJson = await resultNoJson.json();
     const result = resultJson.features
     let onibusNoPlural = [];
+    let linhasEncontradas = []
 
     result.forEach((onibusResponse) => {
         const properties = onibusResponse.properties
         const numerolinha = properties.numerolinha;
-        const index = linhas.findIndex(item => item.linha === numerolinha)
-        if (index != -1) {
-            const dataOnibus = new Date(properties.datalocal)
-            const dataAtual = new Date();
-            const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
-            if(diferenca <= 300){
-                const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
+        for(let index = 0; index < linhas.length; index++){
+            if (linhas[index].linha === numerolinha) {
+                const dataOnibus = new Date(properties.datalocal)
+                const dataAtual = new Date();
+                const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
+                if(diferenca <= 300){
+                    const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
 
-                if (onibusNoPlural[index]) {
-                    onibusNoPlural[index].coordenadas.push(coordenada);
-                } else {
-                    onibusNoPlural[index] = { ...linhas[index], coordenadas: [coordenada] };
+                    if (onibusNoPlural[index]) 
+                        onibusNoPlural[index].coordenadas.push(coordenada);
+
+                    else 
+                        onibusNoPlural[index] = { ...linhas[index], coordenadas: [coordenada] };
+                    
                 }
+                if (!onibusNoPlural[index]) 
+                    linhasEncontradas.push(linhas[index])
+                
+                break;
             }
-
         }
     });
+
     onibusNoPlural = onibusNoPlural.filter(item => item !== null);
     return onibusNoPlural;
 }
