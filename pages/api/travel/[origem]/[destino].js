@@ -43125,8 +43125,10 @@ async function buscarLinhas(origem, destino){
         destinoParadas.map(async parada => {
             const response = await fetch(apiUrl + 'linha/paradacod/' + origemParada[0] + '/paradacod/' + parada.codigo);
             const responseJson = await response.json();
-            linhas.push(item.numero)
-            return responseJson.map(item => ({ linha: item.numero, sentido: item.sentido }));
+            return responseJson.map(item => {
+                linhas.push(item.numero)
+                return { linha: item.numero, sentido: item.sentido }
+            });
         })
     );
     console.log('teste 2.3')
