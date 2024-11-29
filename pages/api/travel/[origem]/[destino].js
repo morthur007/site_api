@@ -43205,7 +43205,7 @@ async function buscarOnibusPorLinha(linhas) {
         }
     })
 
-    return result.filter(linha => linha !== null)
+    return result
 }
 
 
