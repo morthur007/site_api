@@ -43170,7 +43170,7 @@ async function buscarLinhas(origem, destino){
 }*/
 
 async function buscarOnibusPorLinha(linhas) {
-    return await Promise.all(
+    return (await Promise.all(
             linhas.map(async linha => {
                 try{
                     const resultNoJson = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`)
@@ -43197,7 +43197,7 @@ async function buscarOnibusPorLinha(linhas) {
                 }
                 return null
         })
-    ).filter(linha => linha !== null);
+    )).filter(linha => linha !== null);
 
 }
 
