@@ -43159,7 +43159,7 @@ async function buscarOnibusPorLinha(linhas) {
 
     let result = []
 
-    linhas.forEach(async (linha) => {
+    for (let linha of linhas) {
         try {
             const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha}/geo/recent`);
 
@@ -43202,7 +43202,7 @@ async function buscarOnibusPorLinha(linhas) {
         } catch (error) {
             console.error(`Erro ao buscar dados para a linha ${linha}:`, error);
         }
-    })
+    }
 
     return result
 }
