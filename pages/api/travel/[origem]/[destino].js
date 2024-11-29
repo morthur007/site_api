@@ -43156,54 +43156,56 @@ async function ordenarOnibusPorLinha(onibusGps, linhas) {
 }
 
 async function buscarOnibusPorLinha(linhas) {
-    return Promise.all(
-        linhas.map(async linha => {
-            try {
-                const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha}/geo/recent`);
 
-                if (!response.ok) {
-                    //console.error(`Erro HTTP para a linha ${linha}: ${response.status} ${response.statusText}`);
-                    return null;
-                }
+    let result = {}
 
-                const contentType = response.headers.get("content-type");
-                if (!contentType || !contentType.includes("application/json")) {
-                    //console.error(`Tipo de resposta inesperado para a linha ${linha}: ${contentType}`);
-                    //console.error(`Resposta completa:`, await response.text());
-                    return null;
-                }
+    linhas.forEach(async (linha, i) => {
+        try {
+            const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha}/geo/recent`);
 
-                const resultJson = await response.json();
-
-                if (resultJson && resultJson.features) {
-                    const todosOnibus = resultJson.features
-                        .map(onibus => {
-                            const { properties, geometry } = onibus;
-                            const horarioOnibus = new Date(properties.horario);
-                            const horarioAtual = new Date();
-                            const diferenca = (horarioAtual - horarioOnibus) / 1000;
-
-                            if (diferenca <= 300) {
-                                return {
-                                    id: properties.numero,
-                                    latitude: geometry.coordinates[1],
-                                    longitude: geometry.coordinates[0],
-                                };
-                            }
-                            return null;
-                        })
-                        .filter(onibus => onibus !== null);
-
-                    if (todosOnibus.length > 0) {
-                        return { linha, onibus: todosOnibus };
-                    }
-                }
-            } catch (error) {
-                console.error(`Erro ao buscar dados para a linha ${linha}:`, error);
+            if (!response.ok) {
+                //console.error(`Erro HTTP para a linha ${linha}: ${response.status} ${response.statusText}`);
+                return;
             }
-            return null;
-        })
-    ).then(results => results.filter(linha => linha !== null));
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                //console.error(`Tipo de resposta inesperado para a linha ${linha}: ${contentType}`);
+                //console.error(`Resposta completa:`, await response.text());
+                return;
+            }
+
+            const resultJson = await response.json();
+
+            if (resultJson && resultJson.features) {
+                const todosOnibus = resultJson.features
+                    .map(onibus => {
+                        const { properties, geometry } = onibus;
+                        const horarioOnibus = new Date(properties.horario);
+                        const horarioAtual = new Date();
+                        const diferenca = (horarioAtual - horarioOnibus) / 1000;
+
+                        if (diferenca <= 300) {
+                            return {
+                                id: properties.numero,
+                                latitude: geometry.coordinates[1],
+                                longitude: geometry.coordinates[0],
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(onibus => onibus !== null);
+
+                if (todosOnibus.length > 0) {
+                    result = { linha, onibus: todosOnibus };
+                }
+            }
+        } catch (error) {
+            console.error(`Erro ao buscar dados para a linha ${linha}:`, error);
+        }
+    })
+
+    return result.filter(linha => linha !== null)
 }
 
 
