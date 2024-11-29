@@ -43170,35 +43170,48 @@ async function buscarLinhas(origem, destino){
 }*/
 
 async function buscarOnibusPorLinha(linhas) {
-    return (await Promise.all(
-            linhas.map(async linha => {
-                try{
-                    const resultNoJson = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`)
-                    const resultJson = await resultNoJson.json();
-                    if(resultJson && resultJson.features.length > 0){
-                        const features = resultJson.features
+    return Promise.all(
+        linhas.map(async linha => {
+            try {
+                const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`);
+                
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    console.error(`Resposta inesperada para a linha ${linha.linha}:`, await response.text());
+                    return null;
+                }
 
-                        const todosOnibus = features.map(onibus => {
-                            const properties = onibus.properties
-                            const horarioOnibus = new Date(properties.horario)
-                            const horarioAtual = new Date()
+                const resultJson = await response.json();
+
+                if (resultJson && resultJson.features) {
+                    const todosOnibus = resultJson.features
+                        .map(onibus => {
+                            const { properties, geometry } = onibus;
+                            const horarioOnibus = new Date(properties.horario);
+                            const horarioAtual = new Date();
                             const diferenca = (horarioAtual - horarioOnibus) / 1000;
 
-                            if(diferenca <= 300){
-                                return {id:properties.numero, latitude:onibus.geometry.coordinates[1], longitude:onibus.geometry.coordinates[0]}
+                            if (diferenca <= 300) {
+                                return {
+                                    id: properties.numero,
+                                    latitude: geometry.coordinates[1],
+                                    longitude: geometry.coordinates[0],
+                                };
                             }
-                            return null
-                        }).filter(onibus => onibus !== null);
-                        return {...linha, coordenadas: todosOnibus}
-                    }
-            
-                } catch (error) {
-                    console.error(`Erro ao buscar dados para a linha ${linha.linha}:`, error);
-                }
-                return null
-        })
-    )).filter(linha => linha !== null);
+                            return null;
+                        })
+                        .filter(onibus => onibus !== null);
 
+                    if (todosOnibus.length > 0) {
+                        return { ...linha, coordenadas: todosOnibus };
+                    }
+                }
+            } catch (error) {
+                console.error(`Erro ao buscar dados para a linha ${linha.linha}:`, error);
+            }
+            return null;
+        })
+    ).then(results => results.filter(linha => linha !== null));
 }
 
 async function buscarOnibusPorLinha2(linhas) {
