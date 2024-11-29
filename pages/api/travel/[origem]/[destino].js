@@ -43157,9 +43157,9 @@ async function ordenarOnibusPorLinha(onibusGps, linhas) {
 
 async function buscarOnibusPorLinha(linhas) {
 
-    let result = {}
+    let result = []
 
-    linhas.forEach(async (linha, i) => {
+    linhas.forEach(async (linha) => {
         try {
             const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha}/geo/recent`);
 
@@ -43196,7 +43196,7 @@ async function buscarOnibusPorLinha(linhas) {
                     }).filter(onibus => onibus !== null);
 
                 if (todosOnibus.length > 0) {
-                    result = { linha, onibus: todosOnibus };
+                    result.push({ linha, onibus: todosOnibus });
                 }
             }
         } catch (error) {
