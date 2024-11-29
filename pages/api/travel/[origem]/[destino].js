@@ -43175,7 +43175,7 @@ async function buscarOnibusPorLinha(linhas) {
                 try{
                     const resultNoJson = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`)
                     const resultJson = await resultNoJson.json();
-                    if(resultJson && resultJson.features){
+                    if(resultJson && resultJson.features.length > 0){
                         const features = resultJson.features
 
                         const todosOnibus = features.map(onibus => {
