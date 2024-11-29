@@ -43174,10 +43174,16 @@ async function buscarOnibusPorLinha(linhas) {
         linhas.map(async linha => {
             try {
                 const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`);
-                
+
+                if (!response.ok) {
+                    console.error(`Erro HTTP para a linha ${linha.linha}: ${response.status} ${response.statusText}`);
+                    return null;
+                }
+
                 const contentType = response.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
-                    console.error(`Resposta inesperada para a linha ${linha.linha}:`, await response.text());
+                    console.error(`Tipo de resposta inesperado para a linha ${linha.linha}: ${contentType}`);
+                    console.error(`Resposta completa:`, await response.text());
                     return null;
                 }
 
