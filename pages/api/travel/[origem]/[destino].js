@@ -43193,8 +43193,7 @@ async function buscarOnibusPorLinha(linhas) {
                             };
                         }
                         return null;
-                    })
-                    .filter(onibus => onibus !== null);
+                    }).filter(onibus => onibus !== null);
 
                 if (todosOnibus.length > 0) {
                     result = { linha, onibus: todosOnibus };
