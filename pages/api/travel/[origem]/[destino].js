@@ -43135,17 +43135,14 @@ async function buscarLinhas(origem, destino){
     return [origemParada[1], destinoParadas, result, linhas]
 }
 
-async function ordenarOnibusPorLinha(onibusGps, linhas){
-
+async function ordenarOnibusPorLinha(onibusGps, linhas) {
     return linhas.map(linha => {
-        onibusGps.forEach(onibus => {
-            if(linha.linha === onibus.linha){
-                return {...linha, coordenadas: onibus.onibus}
-            }
-        })
-        return null
+        const onibusDaLinha = onibusGps.find(onibus => linha.linha === onibus.linha);
+        if (onibusDaLinha) {
+            return { ...linha, coordenadas: onibusDaLinha.onibus };
+        }
+        return null;
     }).filter(linha => linha !== null);
-
 }
 
 async function buscarOnibusPorLinha(linhas) {
@@ -43161,7 +43158,7 @@ async function buscarOnibusPorLinha(linhas) {
 
                 const contentType = response.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
-                    //console.error(`Tipo de resposta inesperado para a linha ${linha.linha}: ${contentType}`);
+                    //console.error(`Tipo de resposta inesperado para a linha ${linha}: ${contentType}`);
                     //console.error(`Resposta completa:`, await response.text());
                     return null;
                 }
@@ -43188,7 +43185,7 @@ async function buscarOnibusPorLinha(linhas) {
                         .filter(onibus => onibus !== null);
 
                     if (todosOnibus.length > 0) {
-                        return {linha: linha, onibus: todosOnibus };
+                        return { linha, onibus: todosOnibus };
                     }
                 }
             } catch (error) {
