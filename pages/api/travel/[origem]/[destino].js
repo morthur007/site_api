@@ -43170,26 +43170,35 @@ async function buscarLinhas(origem, destino){
 }*/
 
 async function buscarOnibusPorLinha(linhas) {
-    const onibusResult = linhas.map(async linha => {
-        const resultNoJson = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`)
-        const resultJson = await resultNoJson.json();
-        const features = resultJson.features
-        const todosOnibus = features.map(onibus => {
-            const properties = onibus.properties
-            const horarioOnibus = new Date(properties.horario)
-            const horarioAtual = new Date()
-            const diferenca = horarioOnibus - horarioAtual;
+    return await Promise.all(
+            linhas.map(async linha => {
+                try{
+                    const resultNoJson = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha.linha}/geo/recent`)
+                    const resultJson = await resultNoJson.json();
+                    if(resultJson){
+                        const features = resultJson.features
 
-            if(diferenca <= 300){
-                return {id:properties.numero, latitude:onibus.geometry.coordinates[1], longitude:onibus.geometry.coordinates[0]}
-            }
-            return null
+                        const todosOnibus = features.map(onibus => {
+                            const properties = onibus.properties
+                            const horarioOnibus = new Date(properties.horario)
+                            const horarioAtual = new Date()
+                            const diferenca = (horarioAtual - horarioOnibus) / 1000;
+
+                            if(diferenca <= 300){
+                                return {id:properties.numero, latitude:onibus.geometry.coordinates[1], longitude:onibus.geometry.coordinates[0]}
+                            }
+                            return null
+                        }).filter(onibus => onibus !== null);
+                        return {...linha, coordenadas: todosOnibus}
+                    }
+            
+                } catch (error) {
+                    console.error(`Erro ao buscar dados para a linha ${linha.linha}:`, error);
+                }
+                return null
         })
-        return {...linhas, coordenadas: todosOnibus}
-    })
+    ).filter(linha => linha !== null);
 
-    return onibusResult.filter(linha => linha !== null)
-    
 }
 
 async function buscarOnibusPorLinha2(linhas) {
