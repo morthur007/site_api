@@ -43124,21 +43124,12 @@ async function buscarLinhas(origem, destino){
     const result = await Promise.all(
         destinoParadas.map(async parada => {
             const response = await fetch(apiUrl + 'linha/paradacod/' + origemParada[0] + '/paradacod/' + parada.codigo);
-            try{
-                const responseJson = await response.json();
-                return responseJson.map(item => {
-                    linhas.push(item.numero)
-                    return { linha: item.numero, sentido: item.sentido }
-                });
-            }catch(error){
-                const response = await fetch(apiUrl + 'linha/paradacod/' + origemParada[0] + '/paradacod/' + parada.codigo);
-                const responseJson = await response.json();
-                return responseJson.map(item => {
-                    linhas.push(item.numero)
-                    return { linha: item.numero, sentido: item.sentido }
-                });
-
-            }
+            const responseJson = await response.json();
+            return responseJson.map(item => {
+                linhas.push(item.numero)
+                return { linha: item.numero, sentido: item.sentido }
+            });
+            
         })
     );
     console.log('teste 2.3')
