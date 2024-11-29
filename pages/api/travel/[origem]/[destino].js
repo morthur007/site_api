@@ -43156,23 +43156,20 @@ async function ordenarOnibusPorLinha(onibusGps, linhas) {
 }
 
 async function buscarOnibusPorLinha(linhas) {
-
-    let result = []
-
-    for (let linha of linhas) {
+    const promises = linhas.map(async (linha) => {
         try {
             const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha}/geo/recent`);
 
             if (!response.ok) {
                 //console.error(`Erro HTTP para a linha ${linha}: ${response.status} ${response.statusText}`);
-                return;
+                return null;
             }
 
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 //console.error(`Tipo de resposta inesperado para a linha ${linha}: ${contentType}`);
                 //console.error(`Resposta completa:`, await response.text());
-                return;
+                return null;
             }
 
             const resultJson = await response.json();
@@ -43196,16 +43193,22 @@ async function buscarOnibusPorLinha(linhas) {
                     }).filter(onibus => onibus !== null);
 
                 if (todosOnibus.length > 0) {
-                    result.push({ linha, onibus: todosOnibus });
+                    return { linha, onibus: todosOnibus };
                 }
             }
         } catch (error) {
-            console.error(`Erro ao buscar dados para a linha ${linha}:`, error);
+            //console.error(`Erro ao buscar dados para a linha ${linha}:`, error);
         }
-    }
+        return null;
+    });
 
-    return result
+    // Aguardar todas as promessas serem resolvidas
+    const results = await Promise.all(promises);
+    
+    // Filtrar resultados válidos (não null)
+    return results.filter(linha => linha !== null);
 }
+
 
 
 
