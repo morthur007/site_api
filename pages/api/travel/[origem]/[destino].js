@@ -1,5 +1,3 @@
-import { format } from 'path';
-
 const axios = require('axios');
 const fs = require('fs');
 
@@ -43018,18 +43016,33 @@ const objetoJSON = [
 async function main(req, res) {
   try {
     let { origem, destino } = req.query;
-    let origemEnd = origem;
-    let destinoEnd = destino;
+    let origemEnd = decodeURIComponent(origem);
+    let destinoEnd = decodeURIComponent(destino);
     console.log('teste 0 ' + origemEnd + " " + destinoEnd)
 
     let result = await buscarLinhas(origemEnd, destinoEnd);
     console.log('teste 1')
-
-    const linhas = result[2]
     
-    const onibusGps = await buscarOnibusPorLinha(result[3])
 
-    const coordenadasFiltradas =  await Promise.all(linhas.map(async linha => {return await ordenarOnibusPorLinha(onibusGps, linha)}))
+
+    /*const coordenadasPromises = linhas.map(async (linha) => {
+        const coordenadas = await gps(linha.linha);
+        return {
+            linha: linha.linha,
+            sentido: linha.sentido,
+            coordenadas: coordenadas,
+        };
+    });
+    console.error('teste 2')
+    const coordenadasResult = await Promise.all(coordenadasPromises);
+
+    console.error('teste 5')
+
+    const coordenadasFiltradas = coordenadasResult.filter(item => item.coordenadas !== null);*/
+
+    const paradasDestino = result[2]
+
+    const coordenadasFiltradas =  await Promise.all(paradasDestino.map(async parada => {return await buscarOnibusPorLinha(parada)}))
 
     console.log('teste 3')
 
@@ -43038,6 +43051,15 @@ async function main(req, res) {
     console.error(error);
     res.status(500).send('Erro Interno do Servidor');
   }
+}
+
+async function linhasfun(origemEnd, destinoEnd){
+    let resultCru = await buscarLinhas(origemEnd, destinoEnd);
+    const origem = resultCru[0]
+    const destino = resultCru[1]
+    resultCru = resultCru[2]
+
+    return [origem, destino, onibus]
 }
 
 function calcularDistancia(coord1, coord2) {
@@ -43077,7 +43099,7 @@ async function encontrarParadaMaisProximaDestino(coordenadaDestino, paradas) {
         const distanciaAtual = calcularDistancia(coordenadaDestino, parada.coordenadas);
         parada['distancia'] = distanciaAtual;
 
-        if (paradasMaisProximas.length < 7) {
+        if (paradasMaisProximas.length < 12) {
             paradasMaisProximas.push(parada);
         }else{
             
@@ -43116,91 +43138,73 @@ async function buscarLinhas(origem, destino){
     const [origemCoord, destinoCoord] = await Promise.all([enderecoParaCoordenadas(origem), enderecoParaCoordenadas(destino)]); // 1,5 segundos, 1.34 segundos
     console.log('teste 2.1')
 
-    const [origemParada, destinoParadas] = await Promise.all([encontrarParadaMaisProxima(origemCoord, objetoJSON), encontrarParadaMaisProximaDestino(destinoCoord, objetoJSON)]); 
-    console.log('teste 2.2 --> ' + apiUrl + 'linha/paradacod/' + origemParada[0] + '/paradacod/' + destinoParadas[0].codigo)
-
-    let linhas = []
+    const [origemParad, destinoParad] = await Promise.all([encontrarParadaMaisProxima(origemCoord, objetoJSON), encontrarParadaMaisProximaDestino(destinoCoord, objetoJSON)]); 
+    console.log('teste 2.2 --> ' + apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + destinoParad[0].codigo)
 
     const result = await Promise.all(
-        destinoParadas.map(async parada => {
-            const response = await fetch(apiUrl + 'linha/paradacod/' + origemParada[0] + '/paradacod/' + parada.codigo);
+        destinoParad.map(async parada => {
+            const response = await fetch(apiUrl + 'linha/paradacod/' + origemParad[0] + '/paradacod/' + parada.codigo);
             const responseJson = await response.json();
-            return responseJson.map(item => {
-                linhas.push(item.numero)
-                return { linha: item.numero, sentido: item.sentido }
-            });
-            
+            return responseJson.map(item => ({ linha: item.numero, sentido: item.sentido }));
         })
     );
     console.log('teste 2.3')
-    return [origemParada[1], destinoParadas, result, linhas]
+    return [origemParad[1], destinoParad, result]
 }
 
-async function ordenarOnibusPorLinha(onibusGps, linhas) {
-    return linhas.map(linha => {
-        const onibusDaLinha = onibusGps.find(onibus => linha.linha === onibus.linha);
-        if (onibusDaLinha) {
-            return { ...linha, coordenadas: onibusDaLinha.onibus };
-        }
+/*async function gps(numero) {
+    const resultNoJson = await fetch(`${apiUrl}gps/linha/${numero}/geo/recent`);
+    const result = await resultNoJson.json();
+    let linhas = result.features;
+    if (Object.keys(linhas).length !== 0) {
+        return linhas.map(linha => ({
+            id: linha.properties.numero,
+            latitude: linha.geometry.coordinates[1],
+            longitude: linha.geometry.coordinates[0]
+        }));
+    } else {
         return null;
-    }).filter(linha => linha !== null);
-}
+    }
+}*/
 
 async function buscarOnibusPorLinha(linhas) {
-    const promises = linhas.map(async (linha) => {
-        try {
-            const response = await fetch(`https://www.sistemas.dftrans.df.gov.br/gps/linha/${linha}/geo/recent`);
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    const resultNoJson = await fetch("https://geoserver.semob.df.gov.br/geoserver/semob/wfs?service=WFS&request=GetFeature&typeName=semob:Ultima%20Posicao%20Transmitida&outputFormat=json");
 
-            if (!response.ok) {
-                //console.error(`Erro HTTP para a linha ${linha}: ${response.status} ${response.statusText}`);
-                return null;
-            }
+    const resultJson = await resultNoJson.json();
+    const result = resultJson.features
+    let onibusNoPlural = [];
+    let linhasEncontradas = []
 
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                //console.error(`Tipo de resposta inesperado para a linha ${linha}: ${contentType}`);
-                //console.error(`Resposta completa:`, await response.text());
-                return null;
-            }
+    result.forEach((onibusResponse) => {
+        const properties = onibusResponse.properties
+        const numerolinha = properties.numerolinha;
+        for(let index = 0; index < linhas.length; index++){
+            if (linhas[index].linha === numerolinha) {
+                const dataOnibus = new Date(properties.datalocal)
+                const dataAtual = new Date();
+                const diferenca = (dataAtual.getTime() - dataOnibus.getTime())/1000
+                if(diferenca <= 300){
+                    const coordenada = {id:properties.imei, latitude:properties.latitude, longitude:properties.longitude}
 
-            const resultJson = await response.json();
+                    if (onibusNoPlural[index]) 
+                        onibusNoPlural[index].coordenadas.push(coordenada);
 
-            if (resultJson && resultJson.features) {
-                const todosOnibus = resultJson.features
-                    .map(onibus => {
-                        const { properties, geometry } = onibus;
-                        const horarioOnibus = new Date(properties.horario);
-                        const horarioAtual = new Date();
-                        const diferenca = (horarioAtual - horarioOnibus) / 1000;
-
-                        if (diferenca <= 300) {
-                            return {
-                                id: properties.numero,
-                                latitude: geometry.coordinates[1],
-                                longitude: geometry.coordinates[0],
-                            };
-                        }
-                        return null;
-                    }).filter(onibus => onibus !== null);
-
-                if (todosOnibus.length > 0) {
-                    return { linha, onibus: todosOnibus };
+                    else 
+                        onibusNoPlural[index] = { ...linhas[index], coordenadas: [coordenada] };
+                    
                 }
+                if (!onibusNoPlural[index]) 
+                    linhasEncontradas.push(linhas[index])
+                
+                break;
             }
-        } catch (error) {
-            //console.error(`Erro ao buscar dados para a linha ${linha}:`, error);
         }
-        return null;
     });
 
-    // Aguardar todas as promessas serem resolvidas
-    const results = await Promise.all(promises);
-    
-    // Filtrar resultados válidos (não null)
-    return results.filter(linha => linha !== null);
+    onibusNoPlural = onibusNoPlural.filter(item => item !== null);
+    return onibusNoPlural;
 }
-
-
 
 
 export default main;
